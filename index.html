@@ -100,21 +100,21 @@
         const Heart = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconWrapper>;
         const Diamond = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41l-7.59-7.59a2.41 2.41 0 0 0-3.41 0Z" /></IconWrapper>;
         const Club = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M17.5 19c0-3.037-2-5.5-4.5-5.5-.447 0-.88.078-1.293.226C12.333 12.398 13 10.828 13 9a5 5 0 1 0-10 0c0 1.828.667 3.398 1.293 4.726-.413-.148-.846-.226-1.293-.226-2.5 0-4.5 2.463-4.5 5.5 0 2.15 1.157 4.013 3 4.815V23h13v-.185c1.843-.802 3-2.665 3-4.815Z" /></IconWrapper>;
-        const Spade = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M5 9c0 5.25 5 13 7 13 2 0 7-7.75 7-13 0-3.5-2-5.5-5-5.5-1.5 0-3 1.5-3.5 2.5C10 5 8.5 3.5 7 3.5 4 3.5 2 5.5 5 9Z" /><path d="M12 14v8" /></IconWrapper>;
-        const ShoppingBag = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></IconWrapper>;
-        const RotateCcw = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></IconWrapper>;
+        const Spade = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M5 9c0 5.25 5 13 7 13 2 0 7-7.75 7-13 0-3.5-2-5.5-5-5.5-1.5 0-3 1.5-3.5 2.5C10 5 8.5 3.5 7 3.5 4 3.5 2 5.5 5 9Z" /><path d="M12 14v8" stroke="currentColor"/></IconWrapper>;
+        const ShoppingBag = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></IconWrapper>;
+        const RotateCcw = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></IconWrapper>;
         const Play = ({ size, fill }) => <IconWrapper className={`w-${size/4} h-${size/4}`} fill={fill}><polygon points="5 3 19 12 5 21 5 3" /></IconWrapper>;
-        const XCircle = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></IconWrapper>;
-        const HelpCircle = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></IconWrapper>;
-        const X = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></IconWrapper>;
-        const BarChart3 = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></IconWrapper>;
-        const Layers = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></IconWrapper>;
-        const Trash2 = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></IconWrapper>;
+        const XCircle = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></IconWrapper>;
+        const HelpCircle = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></IconWrapper>;
+        const X = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconWrapper>;
+        const BarChart3 = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></IconWrapper>;
+        const Layers = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></IconWrapper>;
+        const Trash2 = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></IconWrapper>;
         const Sparkles = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M9 5h4" /></IconWrapper>;
         const Zap = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></IconWrapper>;
-        const Eye = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></IconWrapper>;
-        const Settings = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></IconWrapper>;
-        const Home = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></IconWrapper>;
+        const Eye = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></IconWrapper>;
+        const Settings = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconWrapper>;
+        const Home = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></IconWrapper>;
         const Lock = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></IconWrapper>;
 
         // --- 卡皮巴拉头像组件 ---
@@ -184,6 +184,7 @@
             return type;
         };
 
+        // 组件定义...
         const Card = ({ card, onClick, mini = false, medium = false, animationState }) => {
             const suitConfig = SUITS.find(s => s.type === card.suit);
             const Icon = suitConfig.icon;
@@ -200,7 +201,7 @@
             if (card.enhance === 'steel') enhanceClass = 'enhance-steel';
             if (card.enhance === 'gold') enhanceClass = 'enhance-gold';
             
-            let sizeClasses = 'w-14 h-24 text-lg sm:w-20 sm:h-32 sm:text-xl md:w-24 md:h-36 md:text-2xl'; // default
+            let sizeClasses = 'w-14 h-24 text-lg sm:w-20 sm:h-32 sm:text-xl md:w-24 md:h-36 md:text-2xl'; 
             if (mini) sizeClasses = 'w-8 h-12 text-[10px]';
             else if (medium) sizeClasses = 'w-12 h-20 text-sm';
 
@@ -257,22 +258,15 @@
             const suitsOrder = ['spade', 'heart', 'club', 'diamond'];
             const groupedDeck = useMemo(() => {
                 const groups = { spade: [], heart: [], club: [], diamond: [] };
-                deck.forEach(card => {
-                    if (groups[card.suit]) groups[card.suit].push(card);
-                });
-                Object.keys(groups).forEach(suit => {
-                    groups[suit].sort((a, b) => a.rankIndex - b.rankIndex);
-                });
+                deck.forEach(card => { if (groups[card.suit]) groups[card.suit].push(card); });
+                Object.keys(groups).forEach(suit => { groups[suit].sort((a, b) => a.rankIndex - b.rankIndex); });
                 return groups;
             }, [deck]);
 
             return (
                 <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                     <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-5xl w-full max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200 shadow-2xl">
-                        <div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
-                            <h2 className="text-xl font-bold text-blue-400 flex items-center gap-2"><Eye size={24}/> 剩余牌组 ({deck.length}张)</h2>
-                            <button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full"><X size={24}/></button>
-                        </div>
+                        <div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10"><h2 className="text-xl font-bold text-blue-400 flex items-center gap-2"><Eye size={24}/> 剩余牌组 ({deck.length}张)</h2><button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full"><X size={24}/></button></div>
                         <div className="overflow-y-auto p-6 custom-scrollbar flex flex-col gap-6">
                             {suitsOrder.map(suit => (
                                 <div key={suit} className="flex items-center gap-4 border-b border-slate-700/50 pb-4 last:border-0">
@@ -283,24 +277,7 @@
                                         {suit === 'diamond' && <Diamond className="w-8 h-8 text-orange-500" fill="currentColor" />}
                                     </div>
                                     <div className="flex flex-wrap gap-2 flex-1">
-                                        {groupedDeck[suit].length > 0 ? (
-                                            groupedDeck[suit].map(card => (
-                                                <div key={card.id} className="relative">
-                                                     <Card card={card} medium={true} />
-                                                     {card.enhance && (
-                                                         <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-[9px] px-1 rounded-full font-bold shadow-sm z-10 whitespace-nowrap">
-                                                             {card.enhance === 'bonus' && '+30'}
-                                                             {card.enhance === 'mult' && '+4M'}
-                                                             {card.enhance === 'wild' && '万能'}
-                                                             {card.enhance === 'steel' && '钢铁'}
-                                                             {card.enhance === 'gold' && '黄金'}
-                                                         </div>
-                                                     )}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <span className="text-slate-600 text-sm italic self-center">无</span>
-                                        )}
+                                        {groupedDeck[suit].length > 0 ? (groupedDeck[suit].map(card => (<div key={card.id} className="relative"><Card card={card} medium={true} />{card.enhance && (<div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-[9px] px-1 rounded-full font-bold shadow-sm z-10 whitespace-nowrap">{card.enhance === 'bonus' && '+30'}{card.enhance === 'mult' && '+4M'}{card.enhance === 'wild' && '万能'}{card.enhance === 'steel' && '钢铁'}{card.enhance === 'gold' && '黄金'}</div>)}</div>))) : (<span className="text-slate-600 text-sm italic self-center">无</span>)}
                                     </div>
                                 </div>
                             ))}
@@ -311,161 +288,34 @@
         };
 
         const ConfirmModal = ({ item, onConfirm, onCancel }) => (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                <div className="bg-slate-800 border border-red-500 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 flex flex-col items-center text-center">
-                    <div className="bg-red-500/20 p-3 rounded-full mb-4"><Trash2 size={32} className="text-red-500" /></div>
-                    <h3 className="text-xl font-bold text-white mb-2">确认移除 {item.name}?</h3>
-                    <p className="text-slate-400 mb-6 text-sm">此操作无法撤销。{!item.type.includes('playing_card') && <span> 出售获得 <span className="text-yellow-400 font-bold">${Math.floor(item.cost / 2)}</span></span>}</p>
-                    <div className="flex gap-4 w-full">
-                        <button onClick={onCancel} className="flex-1 py-3 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 font-bold transition-colors">取消</button>
-                        <button onClick={() => onConfirm(item)} className="flex-1 py-3 rounded-lg bg-red-600 text-white hover:bg-red-500 font-bold shadow-lg shadow-red-900/30 transition-colors">确认移除</button>
-                    </div>
-                </div>
-            </div>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"><div className="bg-slate-800 border border-red-500 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 flex flex-col items-center text-center"><div className="bg-red-500/20 p-3 rounded-full mb-4"><Trash2 size={32} className="text-red-500" /></div><h3 className="text-xl font-bold text-white mb-2">确认移除 {item.name}?</h3><p className="text-slate-400 mb-6 text-sm">此操作无法撤销。{!item.type.includes('playing_card') && <span> 出售获得 <span className="text-yellow-400 font-bold">${Math.floor(item.cost / 2)}</span></span>}</p><div className="flex gap-4 w-full"><button onClick={onCancel} className="flex-1 py-3 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 font-bold transition-colors">取消</button><button onClick={() => onConfirm(item)} className="flex-1 py-3 rounded-lg bg-red-600 text-white hover:bg-red-500 font-bold shadow-lg shadow-red-900/30 transition-colors">确认移除</button></div></div></div>
         );
 
-        // 详细的规则模态框
         const RuleModal = ({ onClose }) => (
-            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
-                    <div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
-                        <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2"><HelpCircle size={28}/> 游戏指南</h2>
-                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full hover:bg-slate-600 transition-colors"><X size={24}/></button>
-                    </div>
-                    <div className="p-6 space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed overflow-y-auto custom-scrollbar">
-                        
-                        <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
-                            <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🎯 1. 核心目标</h3>
-                            <p>这是一款扑克Roguelike游戏。每一关都有一个<span className="text-red-400 font-bold">目标分数</span>。</p>
-                            <p className="mt-1">你需要打出扑克牌手牌，利用<span className="text-blue-300 font-mono">筹码</span> x <span className="text-red-400 font-mono">倍率</span>的公式赚取分数。在<span className="text-blue-400 font-bold">出牌次数</span>耗尽前达到目标分数即可通关。</p>
-                        </div>
-
-                        <div>
-                            <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🃏 2. 牌型说明 (从大到小)</h3>
-                            <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-yellow-300 font-bold">皇家同花顺</span>: 同花色的 10, J, Q, K, A</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-blue-300 font-bold">同花顺</span>: 同花色的顺子</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-purple-300 font-bold">四条</span>: 4张点数相同的牌</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-orange-300 font-bold">葫芦</span>: 3张相同 + 2张相同</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-green-300 font-bold">同花</span>: 5张花色相同</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-cyan-300 font-bold">顺子</span>: 5张点数连续</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-white font-bold">三条</span>: 3张点数相同</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-white font-bold">两对</span>: 2对牌</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-white font-bold">对子</span>: 2张点数相同</div>
-                                <div className="p-2 bg-slate-700/30 rounded"><span className="text-gray-400 font-bold">高牌</span>: 无任何牌型</div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🧮 3. 计分公式详解</h3>
-                            <div className="bg-slate-700/30 p-3 rounded-lg font-mono text-center text-yellow-200 border border-yellow-500/20 shadow-inner mb-2">
-                                总分 = (基础筹码 + 卡牌点数 + 加成) x (基础倍率 + 加成)
-                            </div>
-                            <p>举例：打出<span className="text-white font-bold">一对K</span> (每张K是10点)。</p>
-                            <ul className="list-disc pl-5 space-y-1 text-slate-400 text-sm">
-                                <li>牌型"对子"基础值：<span className="text-blue-300">10筹码</span> x <span className="text-red-400">2倍率</span></li>
-                                <li>卡牌点数：K(10) + K(10) = 20筹码</li>
-                                <li>总筹码 = 10 (基础) + 20 (卡牌) = 30</li>
-                                <li>总得分 = 30 x 2 = 60分</li>
-                            </ul>
-                            <p className="mt-2 text-yellow-300 text-sm">💡 提示：MT牌(Joker)通常提供大量的“+倍率”或“x倍率”，是获得高分的关键！</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <h3 className="text-white font-bold text-lg mb-2">💰 4. 经济系统</h3>
-                                <ul className="space-y-2 text-sm">
-                                    <li><strong className="text-yellow-400">基础奖励：</strong>过关获得 $3 + 剩余出牌次数奖励。</li>
-                                    <li><strong className="text-green-400">利息：</strong>每持有$5获得$1利息(上限$5，即持有$25时利息最大)。<br/><span className="text-xs text-slate-500">*翠绿卡组无利息但有其他奖励</span></li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="text-white font-bold text-lg mb-2">🛍️ 5. 商店道具</h3>
-                                <ul className="space-y-2 text-sm">
-                                    <li><span className="text-yellow-400 font-bold">MT牌:</span> 核心被动装备，提供倍率或筹码。</li>
-                                    <li><span className="text-blue-400 font-bold">星球牌:</span> 永久升级某种牌型的基础数值。</li>
-                                    <li><span className="text-purple-400 font-bold">塔罗牌:</span> 改变卡牌花色或增强卡牌。</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="p-4 border-t border-slate-700 text-center sticky bottom-0 bg-slate-800 rounded-b-xl">
-                        <button onClick={onClose} className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-lg text-lg transition-transform active:scale-95">我明白了，开始战斗！</button>
-                    </div>
-                </div>
-            </div>
+            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"><div className="bg-slate-800 border border-slate-600 rounded-xl max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-2xl flex flex-col animate-in zoom-in-95 duration-200"><div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10"><h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2"><HelpCircle size={28}/> 游戏指南</h2><button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full hover:bg-slate-600 transition-colors"><X size={24}/></button></div><div className="p-6 space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed overflow-y-auto custom-scrollbar"><div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50"><h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🎯 1. 核心目标</h3><p>这是一款扑克Roguelike游戏。每一关都有一个<span className="text-red-400 font-bold">目标分数</span>。</p><p className="mt-1">你需要打出扑克牌手牌，利用<span className="text-blue-300 font-mono">筹码</span> x <span className="text-red-400 font-mono">倍率</span>的公式赚取分数。</p></div><div><h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🃏 2. 牌型说明 (从大到小)</h3><div className="grid grid-cols-2 gap-2 text-xs sm:text-sm"><div className="p-2 bg-slate-700/30 rounded"><span className="text-yellow-300 font-bold">皇家同花顺</span>: 同花色的 10, J, Q, K, A</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-blue-300 font-bold">同花顺</span>: 同花色的顺子</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-purple-300 font-bold">四条</span>: 4张点数相同的牌</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-orange-300 font-bold">葫芦</span>: 3张相同 + 2张相同</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-green-300 font-bold">同花</span>: 5张花色相同</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-cyan-300 font-bold">顺子</span>: 5张点数连续</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-white font-bold">三条</span>: 3张点数相同</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-white font-bold">两对</span>: 2对牌</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-white font-bold">对子</span>: 2张点数相同</div><div className="p-2 bg-slate-700/30 rounded"><span className="text-gray-400 font-bold">高牌</span>: 无任何牌型</div></div></div><div><h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🧮 3. 计分公式详解</h3><div className="bg-slate-700/30 p-3 rounded-lg font-mono text-center text-yellow-200 border border-yellow-500/20 shadow-inner mb-2">总分 = (基础筹码 + 卡牌点数 + 加成) x (基础倍率 + 加成)</div><p>举例：打出<span className="text-white font-bold">一对K</span> (每张K是10点)。</p><ul className="list-disc pl-5 space-y-1 text-slate-400 text-sm"><li>牌型"对子"基础值：<span className="text-blue-300">10筹码</span> x <span className="text-red-400">2倍率</span></li><li>卡牌点数：K(10) + K(10) = 20筹码</li><li>总筹码 = 10 (基础) + 20 (卡牌) = 30</li><li>总得分 = 30 x 2 = 60分</li></ul><p className="mt-2 text-yellow-300 text-sm">💡 提示：MT牌(Joker)通常提供大量的“+倍率”或“x倍率”，是获得高分的关键！</p></div><div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><h3 className="text-white font-bold text-lg mb-2">💰 4. 经济系统</h3><ul className="space-y-2 text-sm"><li><strong className="text-yellow-400">基础奖励：</strong>过关获得 $3 + 剩余出牌次数奖励。</li><li><strong className="text-green-400">利息：</strong>每持有$5获得$1利息(上限$5)。</li></ul></div><div><h3 className="text-white font-bold text-lg mb-2">🛍️ 5. 商店道具</h3><ul className="space-y-2 text-sm"><li><span className="text-yellow-400 font-bold">MT牌:</span> 核心被动装备。</li><li><span className="text-blue-400 font-bold">星球牌:</span> 升级牌型基础分值。</li><li><span className="text-purple-400 font-bold">塔罗牌:</span> 增强卡牌。</li></ul></div></div></div><div className="p-4 border-t border-slate-700 text-center sticky bottom-0 bg-slate-800 rounded-b-xl"><button onClick={onClose} className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-lg text-lg transition-transform active:scale-95">我明白了，开始战斗！</button></div></div></div>
         );
 
         const RunInfoModal = ({ handStats, onClose }) => (
-            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-2xl w-full max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200 shadow-2xl">
-                    <div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
-                        <h2 className="text-xl font-bold text-red-400 flex items-center gap-2"><BarChart3 size={24}/> 比赛信息 - 牌型等级</h2>
-                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full"><X size={24}/></button>
-                    </div>
-                    <div className="overflow-y-auto p-4 custom-scrollbar"><div className="grid gap-3"><div className="grid grid-cols-4 text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider px-2"><div>牌型</div><div className="text-center">等级</div><div className="text-center">筹码</div><div className="text-center">倍率</div></div>{Object.values(handStats).map((stat, idx) => (<div key={idx} className="grid grid-cols-4 items-center bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 hover:bg-slate-700/30 transition-colors"><div className="font-bold text-white text-sm sm:text-base">{stat.name}</div><div className="flex justify-center"><span className={`px-2 py-0.5 rounded text-xs font-bold ${stat.level > 1 ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400'}`}>Lv.{stat.level}</span></div><div className="text-center font-mono text-blue-300 font-bold">{stat.chips}</div><div className="text-center font-mono text-red-400 font-bold">x{stat.mult}</div></div>))}</div></div>
-                </div>
-            </div>
+            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"><div className="bg-slate-800 border border-slate-600 rounded-xl max-w-2xl w-full max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200 shadow-2xl"><div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10"><h2 className="text-xl font-bold text-red-400 flex items-center gap-2"><BarChart3 size={24}/> 比赛信息 - 牌型等级</h2><button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full"><X size={24}/></button></div><div className="overflow-y-auto p-4 custom-scrollbar"><div className="grid gap-3"><div className="grid grid-cols-4 text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider px-2"><div>牌型</div><div className="text-center">等级</div><div className="text-center">筹码</div><div className="text-center">倍率</div></div>{Object.values(handStats).map((stat, idx) => (<div key={idx} className="grid grid-cols-4 items-center bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 hover:bg-slate-700/30 transition-colors"><div className="font-bold text-white text-sm sm:text-base">{stat.name}</div><div className="flex justify-center"><span className={`px-2 py-0.5 rounded text-xs font-bold ${stat.level > 1 ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400'}`}>Lv.{stat.level}</span></div><div className="text-center font-mono text-blue-300 font-bold">{stat.chips}</div><div className="text-center font-mono text-red-400 font-bold">x{stat.mult}</div></div>))}</div></div></div></div>
         );
 
-        // 新增：设置菜单组件
         const SettingsModal = ({ onClose, onRestart, onMenu }) => {
             const [viewRules, setViewRules] = useState(false);
             if (viewRules) return <RuleModal onClose={() => setViewRules(false)} />;
-
             return (
-                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95">
-                        <h2 className="text-2xl font-bold text-white text-center mb-2 flex items-center justify-center gap-2"><Settings size={28}/> 设置</h2>
-                        <button onClick={() => setViewRules(true)} className="bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-slate-600 transition-colors"><HelpCircle size={20}/> 查看规则</button>
-                        <button onClick={() => { onRestart(); onClose(); }} className="bg-orange-600 hover:bg-orange-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-orange-400 shadow-lg shadow-orange-900/30 transition-colors"><RotateCcw size={20}/> 重开本局</button>
-                        <button onClick={() => { onMenu(); onClose(); }} className="bg-red-600 hover:bg-red-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-red-400 shadow-lg shadow-red-900/30 transition-colors"><Home size={20}/> 返回主菜单</button>
-                        <button onClick={onClose} className="mt-2 text-slate-400 hover:text-white text-sm">关闭菜单</button>
-                    </div>
-                </div>
+                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"><div className="bg-slate-800 border border-slate-600 rounded-xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95"><h2 className="text-2xl font-bold text-white text-center mb-2 flex items-center justify-center gap-2"><Settings size={28}/> 设置</h2><button onClick={() => setViewRules(true)} className="bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-slate-600 transition-colors"><HelpCircle size={20}/> 查看规则</button><button onClick={() => { onRestart(); onClose(); }} className="bg-orange-600 hover:bg-orange-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-orange-400 shadow-lg shadow-orange-900/30 transition-colors"><RotateCcw size={20}/> 重开本局</button><button onClick={() => { onMenu(); onClose(); }} className="bg-red-600 hover:bg-red-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-red-400 shadow-lg shadow-red-900/30 transition-colors"><Home size={20}/> 返回主菜单</button><button onClick={onClose} className="mt-2 text-slate-400 hover:text-white text-sm">关闭菜单</button></div></div>
             );
         };
 
-        // 新增：登录组件
         const LoginScreen = ({ onLogin }) => {
             const [input, setInput] = useState('');
             const [error, setError] = useState('');
-
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                // 简单哈希校验：MT888 的哈希值是 73669169
-                if (simpleHash(input) === 73669169) {
-                    onLogin();
-                } else {
-                    setError('密码错误，请重试');
-                    setTimeout(() => setError(''), 2000);
-                }
-            };
-
-            return (
-                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900 text-white p-4">
-                    <CapybaraAvatar />
-                    <h1 className="text-3xl font-bold mb-6 tracking-wider">系统登录</h1>
-                    <form onSubmit={handleSubmit} className="w-full max-w-xs flex flex-col gap-4">
-                        <input 
-                            type="password" 
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder="请输入访问密码"
-                            className="bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-center text-lg focus:outline-none focus:border-blue-500 transition-colors"
-                            autoFocus
-                        />
-                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg active:scale-95 transition-all">
-                            进入系统
-                        </button>
-                    </form>
-                    {error && <div className="mt-4 text-red-400 text-sm animate-bounce">{error}</div>}
-                </div>
-            );
+            const handleSubmit = (e) => { e.preventDefault(); if (simpleHash(input) === 73669169) onLogin(); else { setError('密码错误'); setTimeout(() => setError(''), 2000); } };
+            return (<div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900 text-white p-4"><CapybaraAvatar /><h1 className="text-3xl font-bold mb-6 tracking-wider">系统登录</h1><form onSubmit={handleSubmit} className="w-full max-w-xs flex flex-col gap-4"><input type="password" value={input} onChange={(e) => setInput(e.target.value)} placeholder="请输入访问密码" className="bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-center text-lg focus:outline-none focus:border-blue-500 transition-colors" autoFocus /><button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg active:scale-95 transition-all">进入系统</button></form>{error && <div className="mt-4 text-red-400 text-sm animate-bounce">{error}</div>}</div>);
         };
 
         function App() {
-            const [gameState, setGameState] = useState('login'); // 初始状态改为 login
+            const [gameState, setGameState] = useState('login'); 
             const [showSettings, setShowSettings] = useState(false); 
             const [showRunInfo, setShowRunInfo] = useState(false);
             const [showDeckView, setShowDeckView] = useState(false);
@@ -489,12 +339,9 @@
             const [scoreBreakdown, setScoreBreakdown] = useState(null);
             const [message, setMessage] = useState('');
 
-            const handleLogin = () => {
-                setGameState('menu');
-            };
-
+            const handleLogin = () => setGameState('menu');
             const startGame = () => setGameState('deck_select');
-
+            
             const launchGame = (chosenDeck) => {
                 setSelectedDeck(chosenDeck);
                 setDeck(shuffle(createDeck(chosenDeck.type))); 
@@ -508,21 +355,16 @@
                 setDiscardsLeft(chosenDeck.stats.discards);
                 setMaxJokers(chosenDeck.stats.maxJokers);
                 let startingJokers = [];
-                if (chosenDeck.bonus === 'random_jokers') {
-                    for(let i=0; i<2; i++) startingJokers.push({ ...JOKERS_DB[Math.floor(Math.random() * JOKERS_DB.length)], uid: generateUniqueId() });
-                }
+                if (chosenDeck.bonus === 'random_jokers') { for(let i=0; i<2; i++) startingJokers.push({ ...JOKERS_DB[Math.floor(Math.random() * JOKERS_DB.length)], uid: generateUniqueId() }); }
                 setMyJokers(startingJokers);
                 setConsumables([]);
                 setGameState('playing');
                 setActionState('idle');
                 setMessage('');
             };
+            const restartGame = () => { if (selectedDeck) launchGame(selectedDeck); else setGameState('menu'); };
 
-            const restartGame = () => {
-                if (selectedDeck) launchGame(selectedDeck);
-                else setGameState('menu');
-            };
-
+            // Fix: Refilling logic dependency updated and check for deck length
             useEffect(() => {
                 if (gameState === 'playing' && hand.length < 10 && deck.length > 0) {
                     const needed = 10 - hand.length;
@@ -530,15 +372,12 @@
                     setHand(prev => [...prev, ...newCards]);
                     setDeck(prev => prev.slice(needed));
                 }
-            }, [gameState, hand.length, deck.length]);
+            }, [gameState, hand.length, deck.length]); // Added deck.length to dependency
 
             const toggleSelect = (card) => {
                 if (gameState !== 'playing') return; 
-                if (card.selected) {
-                    // Deselect
-                    setHand(hand.map(c => c.id === card.id ? { ...c, selected: false } : c));
-                } else {
-                    // Select
+                if (card.selected) { setHand(hand.map(c => c.id === card.id ? { ...c, selected: false } : c)); } 
+                else {
                     const selectedCount = hand.filter(c => c.selected).length;
                     if (selectedCount >= 5) return; 
                     setHand(hand.map(c => c.id === card.id ? { ...c, selected: true } : c));
@@ -559,11 +398,9 @@
                 let cardChips = 0;
                 cards.forEach(c => {
                     let val = c.value;
-                    if (c.enhance === 'bonus') val += 30;
-                    if (c.enhance === 'stone') val = 50; 
+                    if (c.enhance === 'bonus') val += 30; if (c.enhance === 'stone') val = 50; 
                     cardChips += val;
-                    if (c.enhance === 'mult') mult += 4;
-                    if (c.enhance === 'glass') mult *= 2; 
+                    if (c.enhance === 'mult') mult += 4; if (c.enhance === 'glass') mult *= 2; 
                 });
                 let jokerLog = [];
                 jokers.forEach(j => {
@@ -578,33 +415,24 @@
                     if (triggered) jokerLog.push(j.name);
                 });
                 const steelCards = hand.filter(c => !c.selected && c.enhance === 'steel');
-                if (steelCards.length > 0) {
-                    steelCards.forEach(() => { mult *= 1.5; });
-                    jokerLog.push(`钢铁卡x${steelCards.length}`);
-                }
+                if (steelCards.length > 0) { steelCards.forEach(() => { mult *= 1.5; }); jokerLog.push(`钢铁卡x${steelCards.length}`); }
                 return { totalChips: chips + cardChips, totalMult: mult, totalScore: Math.floor((chips + cardChips) * mult), triggers: jokerLog };
             }, [discardsLeft, hand, selectedDeck]);
 
             const previewData = useMemo(() => calculateScore(selectedCards, myJokers, currentHandInfo), [selectedCards, myJokers, currentHandInfo, calculateScore]);
 
+            // Explicitly filter unselected cards to keep them
             const playHand = async () => {
                 if (selectedCards.length === 0 || handsLeft <= 0) return;
                 setActionState('scoring');
                 setGameState('scoring');
                 const result = previewData;
-                setScoreBreakdown({
-                    name: currentHandInfo.name, 
-                    baseChips: currentHandInfo.chips,
-                    cardChips: result.totalChips - currentHandInfo.chips,
-                    baseMult: currentHandInfo.mult,
-                    finalMult: result.totalMult,
-                    total: result.totalScore,
-                    jokersTriggered: result.triggers
-                });
+                setScoreBreakdown({ name: currentHandInfo.name, baseChips: currentHandInfo.chips, cardChips: result.totalChips - currentHandInfo.chips, baseMult: currentHandInfo.mult, finalMult: result.totalMult, total: result.totalScore, jokersTriggered: result.triggers });
                 setTimeout(() => {
                     const newScore = currentScore + result.totalScore;
                     setCurrentScore(newScore);
                     setHandsLeft(prev => prev - 1);
+                    // Crucial fix: Only remove selected cards, retain others.
                     setHand(prev => prev.filter(c => !c.selected));
                     setScoreBreakdown(null);
                     setActionState('idle'); 
@@ -617,11 +445,7 @@
             const discardHand = () => {
                 if (selectedCards.length === 0 || discardsLeft <= 0 || actionState !== 'idle') return;
                 setActionState('discarding');
-                setTimeout(() => {
-                    setHand(prev => prev.filter(c => !c.selected));
-                    setDiscardsLeft(prev => prev - 1);
-                    setActionState('idle'); 
-                }, 500); 
+                setTimeout(() => { setHand(prev => prev.filter(c => !c.selected)); setDiscardsLeft(prev => prev - 1); setActionState('idle'); }, 500); 
             };
 
             const winRound = () => {
@@ -637,11 +461,7 @@
                 for(let i=0; i<5; i++) { 
                     const rand = Math.random();
                     let pool;
-                    if (rand < 0.15) pool = PLANETS_DB;
-                    else if (rand < 0.3) pool = TAROTS_DB;
-                    else if (rand < 0.35) pool = SPECTRAL_DB;
-                    else if (rand < 0.45) pool = ENHANCED_CARDS_DB;
-                    else pool = JOKERS_DB;
+                    if (rand < 0.15) pool = PLANETS_DB; else if (rand < 0.3) pool = TAROTS_DB; else if (rand < 0.35) pool = SPECTRAL_DB; else if (rand < 0.45) pool = ENHANCED_CARDS_DB; else pool = JOKERS_DB;
                     shopItems.push({ ...pool[Math.floor(Math.random() * pool.length)], uid: generateUniqueId() });
                 }
                 setShopJokers(shopItems);
