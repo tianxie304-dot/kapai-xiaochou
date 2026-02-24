@@ -2,192 +2,223 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>WEB MT - MTTTTT卡牌 (布局优化版)</title>
-    <!-- 1. 样式库 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WEB MT - MTTTTT卡牌 (iOS修复版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 2. 高性能脚本库 -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
+    <script>
+        window.onload = function() {
+            // 禁止右键菜单
+            document.oncontextmenu = function() { return false; };
+            // 禁止选中 (保留input输入框的选择功能)
+            document.onselectstart = function(e) { 
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    return false; 
+                }
+                return true;
+            };
+            // 禁止复制、剪切、粘贴
+            document.oncopy = function() { return false; };
+            document.oncut = function() { return false; };
+            document.onpaste = function() { return false; };
+            
+            // 禁止常用开发者快捷键
+            document.onkeydown = function(e) {
+                if (
+                    e.keyCode === 123 || // F12
+                    (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I (DevTools)
+                    (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J (Console)
+                    (e.ctrlKey && e.keyCode === 85) || // Ctrl+U (View Source)
+                    (e.ctrlKey && e.keyCode === 83) || // Ctrl+S (Save)
+                    (e.ctrlKey && e.keyCode === 67) || // Ctrl+C (Copy)
+                    (e.ctrlKey && e.keyCode === 86)    // Ctrl+V (Paste)
+                ) {
+                    return false;
+                }
+            };
+        };
+    </script>
+
     <style>
-        /* 全局样式修复 */
-        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; touch-action: none; -webkit-user-select: none; user-select: none; }
-        #root { width: 100%; height: 100%; }
+        /* 防止手机端双击缩放 */
+        body { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
-        /* 滚动条隐藏但保留功能 */
+        /* 强制移除所有元素的点击高亮 (解决iOS灰色背景框问题) */
+        * {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            -webkit-tap-highlight-color: transparent; /* 兼容性写法 */
+            outline: none;
+        }
+
+        /* 禁止文字选中 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        input, textarea {
+            -webkit-user-select: auto !important;
+            -moz-user-select: auto !important;
+            -ms-user-select: auto !important;
+            user-select: auto !important;
+        }
+
+        /* 简单的卡牌翻转效果容器 */
+        .perspective-1000 { perspective: 1000px; }
+        /* 隐藏滚动条但保留功能 */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 自定义滚动条样式 */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 
-        /* 动画定义 */
-        .card-spring { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.2s; }
-        @keyframes bounce-slow { 0%, 100% { transform: translateY(-3%); } 50% { transform: translateY(3%); } }
-        .animate-bounce-slow { animation: bounce-slow 3s infinite ease-in-out; }
-        @keyframes fly-up { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-150px) scale(0.8) rotate(5deg); opacity: 0; } }
-        .animate-fly-up { animation: fly-up 0.6s forwards; }
-        @keyframes fly-down { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(150px) scale(0.8) rotate(-5deg); opacity: 0; } }
-        .animate-fly-down { animation: fly-down 0.5s forwards; }
+        /* --- 动画效果 --- */
+        .card-spring { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.2s, margin 0.2s; }
+        @keyframes fly-up { 
+            0% { transform: translateY(-24px) scale(1.05); opacity: 1; }
+            20% { transform: translateY(-10px) scale(0.9); opacity: 1; } 
+            100% { transform: translateY(-200px) scale(0.8) rotate(5deg); opacity: 0; }
+        }
+        .animate-fly-up { animation: fly-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fly-down {
+            0% { transform: translateY(-24px) scale(1.05); opacity: 1; }
+            100% { transform: translateY(150px) scale(0.8) rotate(-10deg); opacity: 0; }
+        }
+        .animate-fly-down { animation: fly-down 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         
-        /* 特效卡牌样式 */
-        .enhance-bonus { box-shadow: 0 0 10px #3b82f6; border-color: #60a5fa !important; } 
-        .enhance-mult { box-shadow: 0 0 10px #ef4444; border-color: #f87171 !important; } 
-        .enhance-wild { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%) !important; border-color: #a78bfa !important; color: black !important; }
-        .enhance-glass { background: rgba(255,255,255,0.9) !important; opacity: 0.9; border-style: dashed !important; }
-        .enhance-steel { background: #cbd5e1 !important; border-color: #94a3b8 !important; color: #475569 !important; }
-        .enhance-gold { background: #fef9c3 !important; border-color: #eab308 !important; color: #854d0e !important; }
+        /* 卡皮巴拉浮动动画 */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-3%); }
+            50% { transform: translateY(3%); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 3s infinite ease-in-out;
+        }
+
+        /* 特殊卡牌效果 */
+        .enhance-bonus { box-shadow: 0 0 10px #3b82f6; border-color: #60a5fa; } 
+        .enhance-mult { box-shadow: 0 0 10px #ef4444; border-color: #f87171; } 
+        .enhance-wild { border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to right, violet, indigo, blue, green, yellow, orange, red); background-origin: border-box; background-clip: content-box, border-box; }
+        .enhance-glass { background: rgba(255,255,255,0.9); position: relative; overflow: hidden; }
+        .enhance-glass::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.8) 50%, transparent 55%); transform: rotate(30deg); pointer-events: none; }
+        .enhance-steel { background: #e2e8f0; border-color: #94a3b8; color: #475569; }
+        .enhance-gold { border-color: #eab308; background: #fefce8; box-shadow: inset 0 0 10px #facc15; }
     </style>
 </head>
-<body class="antialiased text-slate-100 font-sans">
+<body class="bg-slate-900 text-slate-100 overflow-x-hidden">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
 
-        // --- 1. 图标组件库 ---
-        const IconWrapper = ({ children, className, fill = "none" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
-        );
-        const Icons = {
-            Heart: (p) => <IconWrapper {...p} fill={p.fill}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconWrapper>,
-            Diamond: (p) => <IconWrapper {...p} fill={p.fill}><path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41l-7.59-7.59a2.41 2.41 0 0 0-3.41 0Z" /></IconWrapper>,
-            Club: (p) => <IconWrapper {...p} fill={p.fill}><path d="M17.5 19c0-3.037-2-5.5-4.5-5.5-.447 0-.88.078-1.293.226C12.333 12.398 13 10.828 13 9a5 5 0 1 0-10 0c0 1.828.667 3.398 1.293 4.726-.413-.148-.846-.226-1.293-.226-2.5 0-4.5 2.463-4.5 5.5 0 2.15 1.157 4.013 3 4.815V23h13v-.185c1.843-.802 3-2.665 3-4.815Z" /></IconWrapper>,
-            Spade: (p) => <IconWrapper {...p} fill={p.fill}><path d="M5 9c0 5.25 5 13 7 13 2 0 7-7.75 7-13 0-3.5-2-5.5-5-5.5-1.5 0-3 1.5-3.5 2.5C10 5 8.5 3.5 7 3.5 4 3.5 2 5.5 5 9Z" /><path d="M12 14v8" stroke="currentColor"/></IconWrapper>,
-            Settings: (p) => <IconWrapper {...p}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconWrapper>,
-            BarChart: (p) => <IconWrapper {...p}><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></IconWrapper>,
-            Eye: (p) => <IconWrapper {...p}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></IconWrapper>,
-            Trash: (p) => <IconWrapper {...p}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></IconWrapper>,
-            XCircle: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></IconWrapper>,
-            ShoppingBag: (p) => <IconWrapper {...p}><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></IconWrapper>,
-            Help: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></IconWrapper>,
-            Rotate: (p) => <IconWrapper {...p}><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></IconWrapper>,
-            Home: (p) => <IconWrapper {...p}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></IconWrapper>,
-            Play: (p) => <IconWrapper {...p} fill={p.fill}><polygon points="5 3 19 12 5 21 5 3"/></IconWrapper>,
-            Layers: (p) => <IconWrapper {...p}><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></IconWrapper>,
-            X: (p) => <IconWrapper {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></IconWrapper>,
-            List: (p) => <IconWrapper {...p}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></IconWrapper>,
-            Grid: (p) => <IconWrapper {...p}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></IconWrapper>
+        // --- 工具函数：生成唯一ID ---
+        const generateUniqueId = () => {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
         };
-
-        // --- 2. 数据库配置 ---
-        const SUITS = [
-            { type: 'spade', icon: Icons.Spade, color: 'text-slate-300', name: '黑桃' },
-            { type: 'heart', icon: Icons.Heart, color: 'text-red-500', name: '红桃' },
-            { type: 'club', icon: Icons.Club, color: 'text-indigo-400', name: '梅花' },
-            { type: 'diamond', icon: Icons.Diamond, color: 'text-orange-500', name: '方片' }
-        ];
-        const RANKS = [
-            { label: '2', value: 2 }, { label: '3', value: 3 }, { label: '4', value: 4 }, { label: '5', value: 5 },
-            { label: '6', value: 6 }, { label: '7', value: 7 }, { label: '8', value: 8 }, { label: '9', value: 9 },
-            { label: '10', value: 10 }, { label: 'J', value: 10 }, { label: 'Q', value: 10 }, { label: 'K', value: 10 }, { label: 'A', value: 11 }
-        ];
-        const HAND_NAMES = {
-            'High Card': '高牌', 'Pair': '对子', 'Two Pair': '两对', 'Three of a Kind': '三条',
-            'Straight': '顺子', 'Flush': '同花', 'Full House': '葫芦', 'Four of a Kind': '四条',
-            'Straight Flush': '同花顺', 'Royal Flush': '皇家同花顺'
-        };
-        const DEFAULT_HAND_STATS = {
-            'High Card': { level: 1, chips: 5, mult: 1, name: '高牌' },
-            'Pair': { level: 1, chips: 10, mult: 2, name: '对子' },
-            'Two Pair': { level: 1, chips: 20, mult: 2, name: '两对' },
-            'Three of a Kind': { level: 1, chips: 30, mult: 3, name: '三条' },
-            'Straight': { level: 1, chips: 30, mult: 4, name: '顺子' },
-            'Flush': { level: 1, chips: 35, mult: 4, name: '同花' },
-            'Full House': { level: 1, chips: 40, mult: 4, name: '葫芦' },
-            'Four of a Kind': { level: 1, chips: 60, mult: 7, name: '四条' },
-            'Straight Flush': { level: 1, chips: 100, mult: 8, name: '同花顺' },
-            'Royal Flush': { level: 1, chips: 200, mult: 8, name: '皇家同花顺' }
-        };
-        const DECKS = [
-            { id: 'red', name: '赤红卡组', desc: '每回合 +1 弃牌次数', color: 'from-red-900 to-red-700 border-red-500', stats: { hands: 4, discards: 4, money: 4, maxJokers: 5 } },
-            { id: 'blue', name: '蔚蓝卡组', desc: '每回合 +1 出牌次数', color: 'from-blue-900 to-blue-700 border-blue-500', stats: { hands: 5, discards: 3, money: 4, maxJokers: 5 } },
-            { id: 'yellow', name: '黄金卡组', desc: '开局拥有 $14', color: 'from-yellow-700 to-yellow-600 border-yellow-400', stats: { hands: 4, discards: 3, money: 14, maxJokers: 5 } },
-            { id: 'black', name: '暗黑卡组', desc: '+1 MT槽位，-1 出牌次数', color: 'from-slate-800 to-black border-slate-500', stats: { hands: 3, discards: 3, money: 4, maxJokers: 6 } },
-            { id: 'green', name: '翠绿卡组', desc: '每回合结束时，剩余出牌次数提供金钱', color: 'from-green-900 to-green-700 border-green-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, bonus: 'interest_hands' },
-            { id: 'checkered', name: '方格卡组', desc: '牌组中只有黑桃和红桃', color: 'from-orange-900 to-red-900 border-orange-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, type: 'checkered' },
-            { id: 'abandoned', name: '废弃卡组', desc: '牌组中没有花牌 (J, Q, K)', color: 'from-gray-700 to-gray-900 border-gray-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, type: 'abandoned' },
-            { id: 'plasma', name: '等离子卡组', desc: '计算分数时平衡筹码和倍率 (取平均值)', color: 'from-pink-900 to-purple-900 border-pink-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, type: 'plasma' }
-        ];
-        const JOKERS_DB = [
-            { id: 'j_joker', name: 'MT', desc: '+4 倍率', cost: 4, type: 'add_mult', value: 4 },
-            { id: 'j_greedy', name: '贪婪MT', desc: '打出方片牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'diamond', value: 4 },
-            { id: 'j_wrath', name: '暴怒MT', desc: '打出黑桃牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'spade', value: 4 },
-            { id: 'j_lust', name: '色欲MT', desc: '打出红桃牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'heart', value: 4 },
-            { id: 'j_glut', name: '暴食MT', desc: '打出梅花牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'club', value: 4 },
-            { id: 'j_even', name: '偶数MT', desc: '打出偶数牌(2,4,6,8,10) +4 倍率', cost: 5, type: 'rank_mod_mult', mod: 0, value: 4 },
-            { id: 'j_odd', name: '奇数MT', desc: '打出奇数牌(A,3,5,7,9) +30 筹码', cost: 5, type: 'rank_mod_chips', mod: 1, value: 30 },
-            { id: 'j_scholar', name: '学者', desc: '打出A时 +20 筹码 和 +4 倍率', cost: 8, type: 'card_specific', label: 'A', chips: 20, mult: 4 },
-            { id: 'j_half', name: '半个MT', desc: '如果打出的牌<=3张，+15 倍率', cost: 10, type: 'count_less', count: 3, value: 15 },
-            { id: 'j_banner', name: '旗帜', desc: '每次剩余弃牌次数 +40 筹码', cost: 8, type: 'discard_bonus', value: 40 }
-        ];
-        const PLANETS_DB = [
-            { id: 'p_mercury', name: '水星', desc: '升级 [对子]', cost: 4, type: 'planet', target: 'Pair', chipsMod: 15, multMod: 1, color: 'bg-slate-500' },
-            { id: 'p_venus', name: '金星', desc: '升级 [三条]', cost: 5, type: 'planet', target: 'Three of a Kind', chipsMod: 20, multMod: 2, color: 'bg-yellow-600' },
-            { id: 'p_earth', name: '地球', desc: '升级 [葫芦]', cost: 6, type: 'planet', target: 'Full House', chipsMod: 25, multMod: 2, color: 'bg-green-600' },
-            { id: 'p_mars', name: '火星', desc: '升级 [四条]', cost: 7, type: 'planet', target: 'Four of a Kind', chipsMod: 30, multMod: 3, color: 'bg-red-600' },
-            { id: 'p_jupiter', name: '木星', desc: '升级 [同花]', cost: 6, type: 'planet', target: 'Flush', chipsMod: 15, multMod: 2, color: 'bg-orange-700' },
-            { id: 'p_saturn', name: '土星', desc: '升级 [顺子]', cost: 6, type: 'planet', target: 'Straight', chipsMod: 20, multMod: 2, color: 'bg-yellow-800' },
-            { id: 'p_uranus', name: '天王星', desc: '升级 [两对]', cost: 5, type: 'planet', target: 'Two Pair', chipsMod: 15, multMod: 1, color: 'bg-cyan-600' },
-            { id: 'p_neptune', name: '海王星', desc: '升级 [同花顺]', cost: 8, type: 'planet', target: 'Straight Flush', chipsMod: 40, multMod: 4, color: 'bg-blue-700' },
-            { id: 'p_pluto', name: '冥王星', desc: '升级 [高牌]', cost: 3, type: 'planet', target: 'High Card', chipsMod: 10, multMod: 1, color: 'bg-gray-600' }
-        ];
-        const TAROTS_DB = [
-            { id: 't_magician', name: '魔术师', desc: '将至多2张选中的牌增强为 [万能卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'wild', maxCards: 2, color: 'bg-purple-700' },
-            { id: 't_empress', name: '女皇', desc: '将至多2张选中的牌增强为 [倍率卡] (+4 倍率)', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'mult', maxCards: 2, color: 'bg-pink-700' },
-            { id: 't_hierophant', name: '教皇', desc: '将至多2张选中的牌增强为 [筹码卡] (+30 筹码)', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'bonus', maxCards: 2, color: 'bg-green-700' },
-            { id: 't_lovers', name: '恋人', desc: '将至多1张选中的牌增强为 [万能卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'wild', maxCards: 1, color: 'bg-rose-600' },
-            { id: 't_chariot', name: '战车', desc: '将至多1张选中的牌增强为 [钢铁卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'steel', maxCards: 1, color: 'bg-slate-500' },
-            { id: 't_hermit', name: '隐者', desc: '金钱翻倍 (最多 +$20)', cost: 4, type: 'tarot', effect: 'money', amount: 20, color: 'bg-emerald-700' },
-            { id: 't_devil', name: '恶魔', desc: '将至多1张选中的牌增强为 [黄金卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'gold', maxCards: 1, color: 'bg-yellow-700' }
-        ];
-        const SPECTRAL_DB = [
-            { id: 's_immolate', name: '献祭', desc: '随机摧毁5张手牌，获得$20', cost: 6, type: 'spectral', effect: 'destroy_hand_money', count: 5, amount: 20, color: 'bg-blue-900 border-2 border-blue-400' },
-            { id: 's_cryptid', name: '神秘生物', desc: '复制2张选中的牌', cost: 6, type: 'spectral', effect: 'copy', count: 2, color: 'bg-fuchsia-900 border-2 border-fuchsia-400' }
-        ];
-        const ENHANCED_CARDS_DB = [
-            { id: 'ec_bonus_ace', name: '筹码A', desc: '一张增强的黑桃A (+30筹码)', cost: 6, type: 'playing_card', rank: 12, suit: 'spade', enhance: 'bonus' },
-            { id: 'ec_mult_king', name: '倍率K', desc: '一张增强的红桃K (+4倍率)', cost: 7, type: 'playing_card', rank: 11, suit: 'heart', enhance: 'mult' },
-            { id: 'ec_wild_queen', name: '万能Q', desc: '一张增强的梅花Q (万能花色)', cost: 8, type: 'playing_card', rank: 10, suit: 'club', enhance: 'wild' },
-            { id: 'ec_steel_ten', name: '钢铁10', desc: '一张增强的方片10 (手持x1.5倍)', cost: 6, type: 'playing_card', rank: 8, suit: 'diamond', enhance: 'steel' },
-            { id: 'ec_gold_two', name: '黄金2', desc: '一张增强的黑桃2 (回合结束+$3)', cost: 5, type: 'playing_card', rank: 0, suit: 'spade', enhance: 'gold' }
-        ];
-
-        // --- 3. 工具函数 ---
-        const generateUniqueId = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        
+        // --- 工具函数：简单字符串哈希 ---
         const simpleHash = (str) => {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
-                hash = (hash << 5) - hash + str.charCodeAt(i);
-                hash = hash & hash;
+                const char = str.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash = hash & hash; // Convert to 32bit integer
             }
             return hash;
         };
-        const shuffle = (array) => {
-            let currentIndex = array.length, randomIndex;
-            while (currentIndex !== 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--; [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; }
-            return array;
-        };
+
+        // --- 图标组件 ---
+        const IconWrapper = ({ children, className, fill = "none" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+
+        const Heart = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></IconWrapper>;
+        const Diamond = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41l-7.59-7.59a2.41 2.41 0 0 0-3.41 0Z" /></IconWrapper>;
+        const Club = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M17.5 19c0-3.037-2-5.5-4.5-5.5-.447 0-.88.078-1.293.226C12.333 12.398 13 10.828 13 9a5 5 0 1 0-10 0c0 1.828.667 3.398 1.293 4.726-.413-.148-.846-.226-1.293-.226-2.5 0-4.5 2.463-4.5 5.5 0 2.15 1.157 4.013 3 4.815V23h13v-.185c1.843-.802 3-2.665 3-4.815Z" /></IconWrapper>;
+        const Spade = ({ className, fill }) => <IconWrapper className={className} fill={fill}><path d="M5 9c0 5.25 5 13 7 13 2 0 7-7.75 7-13 0-3.5-2-5.5-5-5.5-1.5 0-3 1.5-3.5 2.5C10 5 8.5 3.5 7 3.5 4 3.5 2 5.5 5 9Z" /><path d="M12 14v8" /></IconWrapper>;
+        const ShoppingBag = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></IconWrapper>;
+        const RotateCcw = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></IconWrapper>;
+        const Play = ({ size, fill }) => <IconWrapper className={`w-${size/4} h-${size/4}`} fill={fill}><polygon points="5 3 19 12 5 21 5 3" /></IconWrapper>;
+        const XCircle = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></IconWrapper>;
+        const HelpCircle = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></IconWrapper>;
+        const X = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></IconWrapper>;
+        const BarChart3 = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></IconWrapper>;
+        const Layers = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></IconWrapper>;
+        const Trash2 = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></IconWrapper>;
+        const Sparkles = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M9 5h4" /></IconWrapper>;
+        const Zap = ({ size, className }) => <IconWrapper className={className || `w-${size/4} h-${size/4}`}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></IconWrapper>;
+        const Eye = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></IconWrapper>;
+        const Settings = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></IconWrapper>;
+        const Home = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></IconWrapper>;
+        const Lock = ({ size }) => <IconWrapper className={`w-${size/4} h-${size/4}`}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></IconWrapper>;
+
+        // --- FlameEffect 组件 ---
+        const FlameEffect = ({ height }) => (
+            <div className={`absolute bottom-0 left-0 w-full bg-orange-600 opacity-20 transition-all duration-1000 ease-out z-0 rounded-b-xl`} style={{ height: `${height}%` }} />
+        );
+
+        // --- 卡皮巴拉头像组件 ---
+        const CapybaraAvatar = () => (
+            <div className="w-40 h-40 sm:w-56 sm:h-56 relative mb-6 animate-bounce-slow">
+                <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-2xl filter saturate-110">
+                    <defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="rgba(0,0,0,0.3)"/></filter></defs>
+                    <circle cx="50" cy="70" r="20" fill="#a67c52" /><circle cx="150" cy="70" r="20" fill="#a67c52" /><circle cx="50" cy="70" r="12" fill="#8a623e" /><circle cx="150" cy="70" r="12" fill="#8a623e" /><rect x="40" y="50" width="120" height="110" rx="55" fill="#c49a6c" /><rect x="60" y="100" width="80" height="50" rx="25" fill="#d6b083" opacity="0.5" /><circle cx="70" cy="95" r="6" fill="#2d2d2d" /><circle cx="130" cy="95" r="6" fill="#2d2d2d" /><circle cx="72" cy="93" r="2" fill="white" /><circle cx="132" cy="93" r="2" fill="white" /><path d="M 90 115 L 110 115 L 100 125 Z" fill="#5c4033" /><line x1="100" y1="125" x2="100" y2="135" stroke="#5c4033" strokeWidth="3" strokeLinecap="round" /><path d="M 90 135 Q 100 145 110 135" stroke="#5c4033" strokeWidth="3" fill="none" strokeLinecap="round" /><circle cx="55" cy="115" r="8" fill="#f472b6" opacity="0.4" /><circle cx="145" cy="115" r="8" fill="#f472b6" opacity="0.4" /><circle cx="100" cy="40" r="18" fill="#fbbf24" stroke="#d97706" strokeWidth="2" /><path d="M 100 22 L 105 15" stroke="#15803d" strokeWidth="3" strokeLinecap="round" /><path d="M 100 22 L 90 18" stroke="#15803d" strokeWidth="3" strokeLinecap="round" /><path d="M 100 25 Q 110 25 108 35" fill="none" stroke="#f59e0b" strokeWidth="2" opacity="0.6" />
+                </svg>
+            </div>
+        );
+
+        // --- 常量定义 ---
+        const SUITS = [{ type: 'spade', icon: Spade, color: 'text-slate-300', name: '黑桃' }, { type: 'heart', icon: Heart, color: 'text-red-500', name: '红桃' }, { type: 'club', icon: Club, color: 'text-indigo-400', name: '梅花' }, { type: 'diamond', icon: Diamond, color: 'text-orange-500', name: '方片' }];
+        const RANKS = [{ label: '2', value: 2 }, { label: '3', value: 3 }, { label: '4', value: 4 }, { label: '5', value: 5 }, { label: '6', value: 6 }, { label: '7', value: 7 }, { label: '8', value: 8 }, { label: '9', value: 9 }, { label: '10', value: 10 }, { label: 'J', value: 10 }, { label: 'Q', value: 10 }, { label: 'K', value: 10 }, { label: 'A', value: 11 }];
+        const HAND_NAMES = { 'High Card': '高牌', 'Pair': '对子', 'Two Pair': '两对', 'Three of a Kind': '三条', 'Straight': '顺子', 'Flush': '同花', 'Full House': '葫芦', 'Four of a Kind': '四条', 'Straight Flush': '同花顺', 'Royal Flush': '皇家同花顺' };
+        const DEFAULT_HAND_STATS = { 'High Card': { level: 1, chips: 5, mult: 1, name: '高牌' }, 'Pair': { level: 1, chips: 10, mult: 2, name: '对子' }, 'Two Pair': { level: 1, chips: 20, mult: 2, name: '两对' }, 'Three of a Kind': { level: 1, chips: 30, mult: 3, name: '三条' }, 'Straight': { level: 1, chips: 30, mult: 4, name: '顺子' }, 'Flush': { level: 1, chips: 35, mult: 4, name: '同花' }, 'Full House': { level: 1, chips: 40, mult: 4, name: '葫芦' }, 'Four of a Kind': { level: 1, chips: 60, mult: 7, name: '四条' }, 'Straight Flush': { level: 1, chips: 100, mult: 8, name: '同花顺' }, 'Royal Flush': { level: 1, chips: 200, mult: 8, name: '皇家同花顺' } };
+        const DECKS = [{ id: 'red', name: '赤红卡组', desc: '每回合 +1 弃牌次数', color: 'from-red-900 to-red-700 border-red-500', stats: { hands: 4, discards: 4, money: 4, maxJokers: 5 } }, { id: 'blue', name: '蔚蓝卡组', desc: '每回合 +1 出牌次数', color: 'from-blue-900 to-blue-700 border-blue-500', stats: { hands: 5, discards: 3, money: 4, maxJokers: 5 } }, { id: 'yellow', name: '黄金卡组', desc: '开局拥有 $14', color: 'from-yellow-700 to-yellow-600 border-yellow-400', stats: { hands: 4, discards: 3, money: 14, maxJokers: 5 } }, { id: 'black', name: '暗黑卡组', desc: '+1 MT槽位，-1 出牌次数', color: 'from-slate-800 to-black border-slate-500', stats: { hands: 3, discards: 3, money: 4, maxJokers: 6 } }, { id: 'green', name: '翠绿卡组', desc: '每回合结束时，剩余出牌次数提供金钱', color: 'from-green-900 to-green-700 border-green-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, bonus: 'interest_hands' }, { id: 'checkered', name: '方格卡组', desc: '牌组中只有黑桃和红桃', color: 'from-orange-900 to-red-900 border-orange-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, type: 'checkered' }, { id: 'abandoned', name: '废弃卡组', desc: '牌组中没有花牌 (J, Q, K)', color: 'from-gray-700 to-gray-900 border-gray-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, type: 'abandoned' }, { id: 'plasma', name: '等离子卡组', desc: '计算分数时平衡筹码和倍率 (取平均值)', color: 'from-pink-900 to-purple-900 border-pink-500', stats: { hands: 4, discards: 3, money: 4, maxJokers: 5 }, type: 'plasma' }];
+        const JOKERS_DB = [{ id: 'j_joker', name: 'MT', desc: '+4 倍率', cost: 4, type: 'add_mult', value: 4 }, { id: 'j_greedy', name: '贪婪MT', desc: '打出方片牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'diamond', value: 4 }, { id: 'j_wrath', name: '暴怒MT', desc: '打出黑桃牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'spade', value: 4 }, { id: 'j_lust', name: '色欲MT', desc: '打出红桃牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'heart', value: 4 }, { id: 'j_glut', name: '暴食MT', desc: '打出梅花牌时 +4 倍率', cost: 6, type: 'suit_mult', suit: 'club', value: 4 }, { id: 'j_even', name: '偶数MT', desc: '打出偶数牌(2,4,6,8,10) +4 倍率', cost: 5, type: 'rank_mod_mult', mod: 0, value: 4 }, { id: 'j_odd', name: '奇数MT', desc: '打出奇数牌(A,3,5,7,9) +30 筹码', cost: 5, type: 'rank_mod_chips', mod: 1, value: 30 }, { id: 'j_scholar', name: '学者', desc: '打出A时 +20 筹码 和 +4 倍率', cost: 8, type: 'card_specific', label: 'A', chips: 20, mult: 4 }, { id: 'j_half', name: '半个MT', desc: '如果打出的牌<=3张，+15 倍率', cost: 10, type: 'count_less', count: 3, value: 15 }, { id: 'j_banner', name: '旗帜', desc: '每次剩余弃牌次数 +40 筹码', cost: 8, type: 'discard_bonus', value: 40 }];
+        const PLANETS_DB = [{ id: 'p_mercury', name: '水星', desc: '升级 [对子]', cost: 4, type: 'planet', target: 'Pair', chipsMod: 15, multMod: 1, color: 'bg-slate-500' }, { id: 'p_venus', name: '金星', desc: '升级 [三条]', cost: 5, type: 'planet', target: 'Three of a Kind', chipsMod: 20, multMod: 2, color: 'bg-yellow-600' }, { id: 'p_earth', name: '地球', desc: '升级 [葫芦]', cost: 6, type: 'planet', target: 'Full House', chipsMod: 25, multMod: 2, color: 'bg-green-600' }, { id: 'p_mars', name: '火星', desc: '升级 [四条]', cost: 7, type: 'planet', target: 'Four of a Kind', chipsMod: 30, multMod: 3, color: 'bg-red-600' }, { id: 'p_jupiter', name: '木星', desc: '升级 [同花]', cost: 6, type: 'planet', target: 'Flush', chipsMod: 15, multMod: 2, color: 'bg-orange-700' }, { id: 'p_saturn', name: '土星', desc: '升级 [顺子]', cost: 6, type: 'planet', target: 'Straight', chipsMod: 20, multMod: 2, color: 'bg-yellow-800' }, { id: 'p_uranus', name: '天王星', desc: '升级 [两对]', cost: 5, type: 'planet', target: 'Two Pair', chipsMod: 15, multMod: 1, color: 'bg-cyan-600' }, { id: 'p_neptune', name: '海王星', desc: '升级 [同花顺]', cost: 8, type: 'planet', target: 'Straight Flush', chipsMod: 40, multMod: 4, color: 'bg-blue-700' }, { id: 'p_pluto', name: '冥王星', desc: '升级 [高牌]', cost: 3, type: 'planet', target: 'High Card', chipsMod: 10, multMod: 1, color: 'bg-gray-600' }];
+        const TAROTS_DB = [{ id: 't_fool', name: '愚者', desc: '生成上一张使用的塔罗牌或星球牌 (本版暂未实现)', cost: 4, type: 'tarot', effect: 'spawn_last', color: 'bg-indigo-600' }, { id: 't_magician', name: '魔术师', desc: '将至多2张选中的牌增强为 [万能卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'wild', maxCards: 2, color: 'bg-purple-700' }, { id: 't_empress', name: '女皇', desc: '将至多2张选中的牌增强为 [倍率卡] (+4 倍率)', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'mult', maxCards: 2, color: 'bg-pink-700' }, { id: 't_hierophant', name: '教皇', desc: '将至多2张选中的牌增强为 [筹码卡] (+30 筹码)', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'bonus', maxCards: 2, color: 'bg-green-700' }, { id: 't_lovers', name: '恋人', desc: '将至多1张选中的牌增强为 [万能卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'wild', maxCards: 1, color: 'bg-rose-600' }, { id: 't_chariot', name: '战车', desc: '将至多1张选中的牌增强为 [钢铁卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'steel', maxCards: 1, color: 'bg-slate-500' }, { id: 't_hermit', name: '隐者', desc: '金钱翻倍 (最多 +$20)', cost: 4, type: 'tarot', effect: 'money', amount: 20, color: 'bg-emerald-700' }, { id: 't_devil', name: '恶魔', desc: '将至多1张选中的牌增强为 [黄金卡]', cost: 4, type: 'tarot', effect: 'enhance', enhanceType: 'gold', maxCards: 1, color: 'bg-yellow-700' }];
+        const SPECTRAL_DB = [{ id: 's_immolate', name: '献祭', desc: '随机摧毁5张手牌，获得$20', cost: 6, type: 'spectral', effect: 'destroy_hand_money', count: 5, amount: 20, color: 'bg-blue-900 border-2 border-blue-400' }, { id: 's_cryptid', name: '神秘生物', desc: '复制2张选中的牌', cost: 6, type: 'spectral', effect: 'copy', count: 2, color: 'bg-fuchsia-900 border-2 border-fuchsia-400' }];
+        const ENHANCED_CARDS_DB = [{ id: 'ec_bonus_ace', name: '筹码A', desc: '一张增强的黑桃A (+30筹码)', cost: 6, type: 'playing_card', rank: 12, suit: 'spade', enhance: 'bonus' }, { id: 'ec_mult_king', name: '倍率K', desc: '一张增强的红桃K (+4倍率)', cost: 7, type: 'playing_card', rank: 11, suit: 'heart', enhance: 'mult' }, { id: 'ec_wild_queen', name: '万能Q', desc: '一张增强的梅花Q (万能花色)', cost: 8, type: 'playing_card', rank: 10, suit: 'club', enhance: 'wild' }, { id: 'ec_steel_ten', name: '钢铁10', desc: '一张增强的方片10 (手持x1.5倍)', cost: 6, type: 'playing_card', rank: 8, suit: 'diamond', enhance: 'steel' }, { id: 'ec_gold_two', name: '黄金2', desc: '一张增强的黑桃2 (回合结束+$3)', cost: 5, type: 'playing_card', rank: 0, suit: 'spade', enhance: 'gold' }];
+
+        // --- 辅助函数 ---
         const createDeck = (deckType) => {
             let deck = [];
             if (deckType === 'checkered') { ['spade', 'heart'].forEach(suit => { for(let i=0; i<2; i++) { RANKS.forEach((rank, index) => { deck.push({ id: generateUniqueId(), suit: suit, rankLabel: rank.label, value: rank.value, rankIndex: index, selected: false }); }); } }); return deck; }
             SUITS.forEach(suit => { RANKS.forEach((rank, index) => { if (deckType === 'abandoned' && (rank.label === 'J' || rank.label === 'Q' || rank.label === 'K')) return; deck.push({ id: generateUniqueId(), suit: suit.type, rankLabel: rank.label, value: rank.value, rankIndex: index, selected: false, suitName: suit.name }); }); });
             return deck;
         };
+
+        const shuffle = (array) => {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--; [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; }
+            return array;
+        };
+
         const detectHandType = (cards) => {
             if (cards.length === 0) return null;
             const sorted = [...cards].sort((a, b) => a.rankIndex - b.rankIndex);
             const ranks = sorted.map(c => c.rankIndex);
             const nonWilds = cards.filter(c => c.enhance !== 'wild');
             let isFlush = false;
-            if (cards.length === 5) { if (nonWilds.length === 0) isFlush = true; else { const firstSuit = nonWilds[0].suit; isFlush = nonWilds.every(c => c.suit === firstSuit); } }
+            if (cards.length === 5) {
+                if (nonWilds.length === 0) isFlush = true; 
+                else { const firstSuit = nonWilds[0].suit; isFlush = nonWilds.every(c => c.suit === firstSuit); }
+            }
             let isStraight = false;
             let uniqueRanks = [...new Set(ranks)];
-            if (cards.length === 5) { if (uniqueRanks.length === 5 && uniqueRanks[4] - uniqueRanks[0] === 4) isStraight = true; if (!isStraight && uniqueRanks.length === 5 && JSON.stringify(uniqueRanks) === JSON.stringify([0, 1, 2, 3, 12])) isStraight = true; }
-            const counts = {}; ranks.forEach(r => counts[r] = (counts[r] || 0) + 1);
+            if (cards.length === 5) {
+                if (uniqueRanks.length === 5 && uniqueRanks[4] - uniqueRanks[0] === 4) isStraight = true;
+                if (!isStraight && uniqueRanks.length === 5 && JSON.stringify(uniqueRanks) === JSON.stringify([0, 1, 2, 3, 12])) isStraight = true;
+            }
+            const counts = {};
+            ranks.forEach(r => counts[r] = (counts[r] || 0) + 1);
             const countValues = Object.values(counts).sort((a, b) => b - a);
             let type = 'High Card';
             if (isFlush && isStraight) { const isRoyal = ranks[0] === 8 && ranks[4] === 12; type = isRoyal ? 'Royal Flush' : 'Straight Flush'; }
@@ -200,15 +231,6 @@
             else if (countValues[0] === 2) type = 'Pair';
             return type;
         };
-
-        // --- 4. 辅助组件 (修改版：接收 className 属性) ---
-        const CapybaraAvatar = ({ className }) => (
-            <div className={`relative animate-bounce-slow ${className || 'w-32 h-32 sm:w-40 sm:h-40 mb-6'}`}>
-                <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-2xl filter saturate-110">
-                    <circle cx="50" cy="70" r="20" fill="#a67c52" /><circle cx="150" cy="70" r="20" fill="#a67c52" /><rect x="40" y="50" width="120" height="110" rx="55" fill="#c49a6c" /><rect x="60" y="100" width="80" height="50" rx="25" fill="#d6b083" opacity="0.5" /><circle cx="70" cy="95" r="6" fill="#2d2d2d" /><circle cx="130" cy="95" r="6" fill="#2d2d2d" /><path d="M 90 115 L 110 115 L 100 125 Z" fill="#5c4033" /><path d="M 90 135 Q 100 145 110 135" stroke="#5c4033" strokeWidth="3" fill="none" strokeLinecap="round" />
-                </svg>
-            </div>
-        );
 
         const Card = ({ card, onClick, mini = false, medium = false, animationState }) => {
             const suitConfig = SUITS.find(s => s.type === card.suit);
@@ -226,13 +248,19 @@
             if (card.enhance === 'steel') enhanceClass = 'enhance-steel';
             if (card.enhance === 'gold') enhanceClass = 'enhance-gold';
             
-            // 优化：牌组预览尺寸 (medium) 和默认尺寸
-            let sizeClasses = 'w-16 h-24 text-lg sm:w-20 sm:h-32 sm:text-xl md:w-24 md:h-36 md:text-2xl'; 
+            let sizeClasses = 'w-14 h-24 text-lg sm:w-20 sm:h-32 sm:text-xl md:w-24 md:h-36 md:text-2xl'; // default
             if (mini) sizeClasses = 'w-8 h-12 text-[10px]';
-            else if (medium) sizeClasses = 'w-20 h-28 sm:w-24 sm:h-32 text-xl font-bold'; // 3. 放大牌组查看器中的牌
+            else if (medium) sizeClasses = 'w-12 h-20 text-sm';
 
+            const baseClasses = `
+                relative flex flex-col items-center justify-center 
+                bg-white border-2 rounded-lg shadow-md select-none cursor-pointer flex-shrink-0 card-spring
+                ${card.selected ? '-translate-y-6 z-30 border-blue-400 shadow-xl ring-2 ring-blue-300' : 'border-gray-200 hover:-translate-y-4 hover:z-20 z-0'}
+                ${sizeClasses}
+                ${animClass} ${enhanceClass} transition-all duration-200
+            `;
             return (
-                <div onClick={() => onClick && onClick(card)} className={`relative flex flex-col items-center justify-center bg-white border-2 rounded-lg shadow-md select-none cursor-pointer flex-shrink-0 card-spring ${card.selected ? '-translate-y-6 z-30 border-blue-400 shadow-xl ring-2 ring-blue-300' : 'border-gray-200 hover:-translate-y-2 hover:z-20 z-0'} ${sizeClasses} ${animClass} ${enhanceClass}`}>
+                <div onClick={() => onClick && onClick(card)} className={baseClasses}>
                     <div className={`absolute top-1 left-1 flex flex-col items-center gap-0 leading-none ${suitConfig.color}`}>
                         <span className={`font-bold ${mini ? 'text-[8px]' : medium ? 'text-xs' : 'text-sm sm:text-lg'}`}>{card.rankLabel}</span>
                         <Icon className={`${mini ? 'w-2 h-2' : medium ? 'w-3 h-3' : 'w-3 h-3 sm:w-4 sm:h-4'}`} fill="currentColor" />
@@ -242,7 +270,15 @@
                         <span className={`font-bold ${mini ? 'text-[8px]' : medium ? 'text-xs' : 'text-sm sm:text-lg'}`}>{card.rankLabel}</span>
                         <Icon className={`${mini ? 'w-2 h-2' : medium ? 'w-3 h-3' : 'w-3 h-3 sm:w-4 sm:h-4'}`} fill="currentColor" />
                     </div>
-                    {card.enhance && (<div className="absolute top-0 right-0 p-0.5"><span className="text-[8px] bg-slate-700 text-white px-1 rounded-bl">{card.enhance}</span></div>)}
+                    {card.enhance && (
+                        <div className="absolute top-0 right-0 p-0.5">
+                            {card.enhance === 'bonus' && <span className="text-[8px] bg-blue-500 text-white px-1 rounded-bl">+30</span>}
+                            {card.enhance === 'mult' && <span className="text-[8px] bg-red-500 text-white px-1 rounded-bl">+4M</span>}
+                            {card.enhance === 'wild' && <span className="text-[8px] bg-purple-500 text-white px-1 rounded-bl">万能</span>}
+                            {card.enhance === 'steel' && <span className="text-[8px] bg-slate-500 text-white px-1 rounded-bl">x1.5</span>}
+                            {card.enhance === 'gold' && <span className="text-[8px] bg-yellow-500 text-white px-1 rounded-bl">$</span>}
+                        </div>
+                    )}
                 </div>
             );
         };
@@ -253,140 +289,66 @@
             if (joker.type === 'tarot') colorClass = joker.color + ' border-white/30';
             if (joker.type === 'spectral') colorClass = joker.color;
             if (joker.type === 'playing_card') colorClass = 'bg-white text-black border-gray-300';
+
             return (
                 <div className={`relative flex flex-col items-center justify-center w-16 h-24 sm:w-20 sm:h-28 border-2 rounded-lg p-1 text-center shadow-lg group flex-shrink-0 ${colorClass}`}>
                     <div className={`font-bold text-xs mb-1 truncate w-full ${joker.type === 'playing_card' ? 'text-black' : 'text-white'}`}>{joker.name}</div>
                     <div className={`text-[9px] leading-tight break-words w-full h-full overflow-hidden flex items-center justify-center ${joker.type === 'playing_card' ? 'text-gray-600' : 'text-gray-200'}`}>{joker.desc}</div>
-                    {onSell && (<button onClick={() => onSell(joker)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md z-10"><Icons.XCircle className="w-4 h-4 text-white"/></button>)}
+                    {onSell && (
+                        <button onClick={() => onSell(joker)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md z-10 hover:bg-red-600 transition-colors"><XCircle size={14} className="text-white"/></button>
+                    )}
                 </div>
             );
         };
 
-        // --- 1. 优化：规则弹窗 (增加详细玩法) ---
-        const RuleModal = ({ onClose }) => (
-            <div className="absolute inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                <div className="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-3xl m-4 max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95">
-                    <div className="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/90 backdrop-blur sticky top-0 z-10">
-                        <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2"><Icons.Help className="w-6 h-6"/> 游戏指南</h2>
-                        <button onClick={onClose}><Icons.X className="w-6 h-6 text-slate-400 hover:text-white"/></button>
-                    </div>
-                    <div className="p-6 overflow-y-auto custom-scrollbar space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed">
-                        <section>
-                            <h3 className="text-xl font-bold text-white mb-2">🎯 核心目标</h3>
-                            <p>这是一款扑克 Roguelike 游戏。你需要通过打出手牌赚取筹码，击败每关的<span className="text-red-400 font-bold">目标分数 (盲注)</span>。</p>
-                        </section>
-                        <section className="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50">
-                            <h3 className="text-xl font-bold text-white mb-2">🧮 计分公式 (核心!)</h3>
-                            <div className="text-center font-mono text-lg bg-slate-800 p-2 rounded mb-2">
-                                <span className="text-blue-400 font-bold">筹码 (Chips)</span> × <span className="text-red-400 font-bold">倍率 (Mult)</span> = 得分
-                            </div>
-                            <ul className="list-disc pl-5 space-y-1">
-                                <li><b>筹码来源：</b>打出的卡牌点数 (2-10, JQK=10, A=11) + 牌型基础值 + 蓝色MT牌加成。</li>
-                                <li><b>倍率来源：</b>牌型基础倍率 + 红色MT牌加成 (这是爆发的关键)。</li>
-                            </ul>
-                        </section>
-                        <section>
-                            <h3 className="text-xl font-bold text-white mb-2">🃏 牌型一览 (从大到小)</h3>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-yellow-300 font-bold">皇家同花顺</span> (同花色 10,J,Q,K,A)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-blue-300 font-bold">同花顺</span> (同花色顺子)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-purple-300 font-bold">四条</span> (4张一样)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-orange-300 font-bold">葫芦</span> (3张一样+2张一样)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-green-300 font-bold">同花</span> (5张同花色)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-cyan-300 font-bold">顺子</span> (5张点数连续)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-white font-bold">三条</span> (3张一样)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-white font-bold">两对</span> (2对牌)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-gray-300 font-bold">对子</span> (2张一样)</div>
-                                <div className="p-2 bg-slate-700 rounded"><span className="text-gray-500 font-bold">高牌</span> (无牌型)</div>
-                            </div>
-                        </section>
-                        <section>
-                            <h3 className="text-xl font-bold text-white mb-2">🛍️ 道具系统</h3>
-                            <ul className="space-y-2">
-                                <li><span className="text-yellow-400 font-bold">MT牌 (Jokers):</span> 提供被动加成，是游戏核心。例如“+4倍率”或“打出红桃+筹码”。</li>
-                                <li><span className="text-blue-400 font-bold">星球牌:</span> 永久升级某种牌型的基础分数。</li>
-                                <li><span className="text-purple-400 font-bold">塔罗牌:</span> 增强单张卡牌（如变万能牌、变黄金牌）。</li>
-                            </ul>
-                        </section>
-                    </div>
-                    <div className="p-4 border-t border-slate-700 bg-slate-800 rounded-b-xl">
-                        <button onClick={onClose} className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-lg shadow-lg">我明白了，开始战斗！</button>
-                    </div>
-                </div>
-            </div>
-        );
-
-        // --- 新增：商品牌图鉴 (MT牌) ---
-        const ProductCompendiumModal = ({ onClose }) => {
-            const Section = ({ title, data }) => (
-                <div className="mb-8">
-                    <h3 className="text-xl font-bold text-white mb-4 border-l-4 border-blue-500 pl-3">{title}</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {data.map(item => (
-                            <div key={item.id} className="flex flex-col items-center p-2 bg-slate-700/30 rounded-xl border border-slate-600/50 hover:bg-slate-700/50 transition-colors">
-                                <JokerCard joker={item} />
-                                <div className="mt-2 text-center w-full">
-                                    <div className="text-[10px] text-slate-400 mb-1 h-8 overflow-hidden">{item.desc}</div>
-                                    <div className="font-bold text-yellow-400 bg-slate-900 px-2 py-0.5 rounded text-xs border border-yellow-500/30 inline-block">${item.cost}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-
-            return (
-                <div className="absolute inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
-                        <div className="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/90 backdrop-blur sticky top-0 z-10">
-                            <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2"><Icons.Layers className="w-6 h-6"/> 全商品图鉴</h2>
-                            <button onClick={onClose}><Icons.X className="w-6 h-6 text-slate-400 hover:text-white"/></button>
-                        </div>
-                        <div className="p-6 overflow-y-auto custom-scrollbar">
-                            <Section title="MT牌 (Jokers)" data={JOKERS_DB} />
-                            <Section title="星球牌 (Planets)" data={PLANETS_DB} />
-                            <Section title="塔罗牌 (Tarots)" data={TAROTS_DB} />
-                            <Section title="幻灵牌 (Spectrals)" data={SPECTRAL_DB} />
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // --- 3. 优化：牌组预览 (分组排序 + 放大显示) ---
         const DeckViewModal = ({ deck, onClose }) => {
-            const sortedDeck = useMemo(() => {
+            const suitsOrder = ['spade', 'heart', 'club', 'diamond'];
+            const groupedDeck = useMemo(() => {
                 const groups = { spade: [], heart: [], club: [], diamond: [] };
-                // 1. 分组
-                deck.forEach(c => { if(groups[c.suit]) groups[c.suit].push(c); });
-                // 2. 排序 (点数从大到小)
-                Object.keys(groups).forEach(key => {
-                    groups[key].sort((a, b) => b.rankIndex - a.rankIndex);
+                deck.forEach(card => {
+                    if (groups[card.suit]) groups[card.suit].push(card);
+                });
+                Object.keys(groups).forEach(suit => {
+                    groups[suit].sort((a, b) => a.rankIndex - b.rankIndex);
                 });
                 return groups;
             }, [deck]);
 
             return (
                 <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
-                        <div className="flex justify-between items-center p-4 border-b border-slate-700">
-                            <h2 className="text-xl font-bold text-blue-400 flex items-center gap-2"><Icons.Eye className="w-6 h-6"/> 剩余牌组 ({deck.length})</h2>
-                            <button onClick={onClose}><Icons.X className="w-6 h-6 text-slate-400 hover:text-white"/></button>
+                    <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-5xl w-full max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200 shadow-2xl">
+                        <div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
+                            <h2 className="text-xl font-bold text-blue-400 flex items-center gap-2"><Eye size={24}/> 剩余牌组 ({deck.length}张)</h2>
+                            <button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full"><X size={24}/></button>
                         </div>
-                        <div className="overflow-y-auto p-4 custom-scrollbar space-y-6">
-                            {['spade', 'heart', 'club', 'diamond'].map(suit => (
-                                <div key={suit} className="flex gap-4 items-start border-b border-slate-700/50 pb-4 last:border-0">
-                                    <div className="w-10 pt-2 flex flex-col items-center">
-                                        {suit === 'spade' && <Icons.Spade className="w-8 h-8 text-slate-300" fill="currentColor"/>}
-                                        {suit === 'heart' && <Icons.Heart className="w-8 h-8 text-red-500" fill="currentColor"/>}
-                                        {suit === 'club' && <Icons.Club className="w-8 h-8 text-indigo-400" fill="currentColor"/>}
-                                        {suit === 'diamond' && <Icons.Diamond className="w-8 h-8 text-orange-500" fill="currentColor"/>}
+                        <div className="overflow-y-auto p-6 custom-scrollbar flex flex-col gap-6">
+                            {suitsOrder.map(suit => (
+                                <div key={suit} className="flex items-center gap-4 border-b border-slate-700/50 pb-4 last:border-0">
+                                    <div className="w-12 flex justify-center text-slate-400">
+                                        {suit === 'spade' && <Spade className="w-8 h-8 text-slate-300" fill="currentColor" />}
+                                        {suit === 'heart' && <Heart className="w-8 h-8 text-red-500" fill="currentColor" />}
+                                        {suit === 'club' && <Club className="w-8 h-8 text-indigo-400" fill="currentColor" />}
+                                        {suit === 'diamond' && <Diamond className="w-8 h-8 text-orange-500" fill="currentColor" />}
                                     </div>
-                                    <div className="flex-1 flex flex-wrap gap-2">
-                                        {sortedDeck[suit].length > 0 ? 
-                                            sortedDeck[suit].map(c => <Card key={c.id} card={c} medium={true} />) : 
-                                            <span className="text-slate-600 italic py-2">无此花色</span>
-                                        }
+                                    <div className="flex flex-wrap gap-2 flex-1">
+                                        {groupedDeck[suit].length > 0 ? (
+                                            groupedDeck[suit].map(card => (
+                                                <div key={card.id} className="relative">
+                                                     <Card card={card} medium={true} />
+                                                     {card.enhance && (
+                                                         <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-[9px] px-1 rounded-full font-bold shadow-sm z-10 whitespace-nowrap">
+                                                             {card.enhance === 'bonus' && '+30'}
+                                                             {card.enhance === 'mult' && '+4M'}
+                                                             {card.enhance === 'wild' && '万能'}
+                                                             {card.enhance === 'steel' && '钢铁'}
+                                                             {card.enhance === 'gold' && '黄金'}
+                                                         </div>
+                                                     )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <span className="text-slate-600 text-sm italic self-center">无</span>
+                                        )}
                                     </div>
                                 </div>
                             ))}
@@ -396,67 +358,158 @@
             );
         };
 
-        const RunInfoModal = ({ handStats, onClose }) => (
-            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"><div className="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95"><div className="flex justify-between items-center p-4 border-b border-slate-700"><h2 className="text-xl font-bold text-red-400">牌型等级</h2><button onClick={onClose}><Icons.X className="w-6 h-6 text-slate-400 hover:text-white"/></button></div><div className="overflow-y-auto p-4 custom-scrollbar"><div className="grid gap-2">{Object.values(handStats).map((stat, idx) => (<div key={idx} className="flex justify-between items-center bg-slate-900/50 p-3 rounded border border-slate-700/50"><span className="text-white font-bold">{stat.name} <span className="text-xs bg-blue-600 px-1 rounded ml-1">Lv.{stat.level}</span></span><span className="font-mono"><span className="text-blue-300">{stat.chips}</span> X <span className="text-red-400">{stat.mult}</span></span></div>))}</div></div></div></div>
-        );
-
-        const SettingsModal = ({ onClose, onRestart, onMenu, onShowRules, onShowJokerCompendium }) => (
-            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                <div className="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95">
-                    <h2 className="text-2xl font-bold text-white text-center mb-2">设置</h2>
-                    <button onClick={() => { onShowRules(); }} className="bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-slate-600"><Icons.Help className="w-5 h-5"/> 查看规则</button>
-                    {/* 修改按钮：查看所有商品牌 */}
-                    <button onClick={() => { onShowJokerCompendium(); }} className="bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-slate-600"><Icons.Grid className="w-5 h-5"/> 查看所有商品牌</button>
-                    <button onClick={() => { onRestart(); onClose(); }} className="bg-orange-600 hover:bg-orange-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2"><Icons.Rotate className="w-5 h-5"/> 重开本局</button>
-                    <button onClick={() => { onMenu(); onClose(); }} className="bg-red-600 hover:bg-red-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2"><Icons.Home className="w-5 h-5"/> 返回主菜单</button>
-                    <button onClick={onClose} className="mt-2 text-slate-400 hover:text-white text-sm">关闭</button>
+        const ConfirmModal = ({ item, onConfirm, onCancel }) => (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div className="bg-slate-800 border border-red-500 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 flex flex-col items-center text-center">
+                    <div className="bg-red-500/20 p-3 rounded-full mb-4"><Trash2 size={32} className="text-red-500" /></div>
+                    <h3 className="text-xl font-bold text-white mb-2">确认移除 {item.name}?</h3>
+                    <p className="text-slate-400 mb-6 text-sm">此操作无法撤销。{!item.type.includes('playing_card') && <span> 出售获得 <span className="text-yellow-400 font-bold">${Math.floor(item.cost / 2)}</span></span>}</p>
+                    <div className="flex gap-4 w-full">
+                        <button onClick={onCancel} className="flex-1 py-3 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 font-bold transition-colors">取消</button>
+                        <button onClick={() => onConfirm(item)} className="flex-1 py-3 rounded-lg bg-red-600 text-white hover:bg-red-500 font-bold shadow-lg shadow-red-900/30 transition-colors">确认移除</button>
+                    </div>
                 </div>
             </div>
         );
 
-        // --- 5. 优化：登录页 (针对手机横屏大幅缩小尺寸) ---
-        const LoginScreen = ({ onLogin }) => {
-            const [input, setInput] = useState('');
-            const [error, setError] = useState('');
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                if (simpleHash(input) === 73669169) onLogin();
-                else { setError('密钥错误'); setTimeout(() => setError(''), 2000); }
-            };
+        // 详细的规则模态框
+        const RuleModal = ({ onClose }) => (
+            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
+                        <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2"><HelpCircle size={28}/> 游戏指南</h2>
+                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full hover:bg-slate-600 transition-colors"><X size={24}/></button>
+                    </div>
+                    <div className="p-6 space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed overflow-y-auto custom-scrollbar">
+                        
+                        <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
+                            <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🎯 1. 核心目标</h3>
+                            <p>这是一款扑克Roguelike游戏。每一关都有一个<span className="text-red-400 font-bold">目标分数</span>。</p>
+                            <p className="mt-1">你需要打出扑克牌手牌，利用<span className="text-blue-300 font-mono">筹码</span> x <span className="text-red-400 font-mono">倍率</span>的公式赚取分数。在<span className="text-blue-400 font-bold">出牌次数</span>耗尽前达到目标分数即可通关。</p>
+                        </div>
+
+                        <div>
+                            <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🃏 2. 游戏流程</h3>
+                            <ul className="list-disc pl-5 space-y-2">
+                                <li><strong className="text-blue-300">选牌与出牌：</strong>点击卡牌选中（最多5张）。打出的牌必须符合扑克牌型（如对子、同花、顺子）才能获得高分。</li>
+                                <li><strong className="text-red-300">弃牌：</strong>如果手牌不好，可以选中不想保留的牌点击“弃牌”，换取新牌（有次数限制）。</li>
+                                <li><strong className="text-yellow-300">商店：</strong>每回合胜利后进入商店，用赚到的钱购买道具增强实力。</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">🧮 3. 计分公式</h3>
+                            <div className="bg-slate-700/30 p-3 rounded-lg font-mono text-center text-yellow-200 border border-yellow-500/20 shadow-inner mb-2">
+                                总分 = (基础筹码 + 卡牌点数) x 总倍率
+                            </div>
+                            <p>例如：打出一对K（点数10）。基础牌型“对子”是 10筹码 x 2倍率。</p>
+                            <p>计算：<span className="font-mono text-slate-400">(10基础 + 10 + 10) x 2 = 60分</span>。</p>
+                            <p className="mt-1 text-slate-400 text-xs">注：MT牌和星球牌可以大幅提升这个公式中的数值！</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <h3 className="text-white font-bold text-lg mb-2">🛍️ 4. 商店道具</h3>
+                                <ul className="space-y-2">
+                                    <li className="flex items-start gap-2"><span className="text-yellow-400 min-w-[60px]">MT牌:</span> <span>提供强大的被动效果（如+4倍率）。需占用槽位。</span></li>
+                                    <li className="flex items-start gap-2"><span className="text-blue-400 min-w-[60px]">星球牌:</span> <span>永久升级特定牌型的基础分值。</span></li>
+                                    <li className="flex items-start gap-2"><span className="text-purple-400 min-w-[60px]">塔罗牌:</span> <span>消耗品。增强手牌（变花色、加倍率等）。</span></li>
+                                    <li className="flex items-start gap-2"><span className="text-red-400 min-w-[60px]">幻灵牌:</span> <span>高风险高回报的稀有消耗品。</span></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="text-white font-bold text-lg mb-2">✨ 5. 卡牌增强</h3>
+                                <ul className="space-y-2">
+                                    <li className="flex items-start gap-2"><span className="text-red-400 min-w-[60px]">倍率卡:</span> <span>打出时 +4 倍率。</span></li>
+                                    <li className="flex items-start gap-2"><span className="text-blue-400 min-w-[60px]">筹码卡:</span> <span>打出时 +30 筹码。</span></li>
+                                    <li className="flex items-start gap-2"><span className="text-purple-400 min-w-[60px]">万能卡:</span> <span>视为所有花色。</span></li>
+                                    <li className="flex items-start gap-2"><span className="text-slate-400 min-w-[60px]">钢铁卡:</span> <span>留在手中时 x1.5 倍率。</span></li>
+                                    <li className="flex items-start gap-2"><span className="text-yellow-400 min-w-[60px]">黄金卡:</span> <span>回合结束在手中 +$3。</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-4 border-t border-slate-700 text-center sticky bottom-0 bg-slate-800 rounded-b-xl">
+                        <button onClick={onClose} className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-lg text-lg transition-transform active:scale-95">我明白了，开始战斗！</button>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const RunInfoModal = ({ handStats, onClose }) => (
+            <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-2xl w-full max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200 shadow-2xl">
+                    <div className="flex justify-between items-center p-4 border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
+                        <h2 className="text-xl font-bold text-red-400 flex items-center gap-2"><BarChart3 size={24}/> 比赛信息 - 牌型等级</h2>
+                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-white bg-slate-700/50 rounded-full"><X size={24}/></button>
+                    </div>
+                    <div className="overflow-y-auto p-4 custom-scrollbar"><div className="grid gap-3"><div className="grid grid-cols-4 text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider px-2"><div>牌型</div><div className="text-center">等级</div><div className="text-center">筹码</div><div className="text-center">倍率</div></div>{Object.values(handStats).map((stat, idx) => (<div key={idx} className="grid grid-cols-4 items-center bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 hover:bg-slate-700/30 transition-colors"><div className="font-bold text-white text-sm sm:text-base">{stat.name}</div><div className="flex justify-center"><span className={`px-2 py-0.5 rounded text-xs font-bold ${stat.level > 1 ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400'}`}>Lv.{stat.level}</span></div><div className="text-center font-mono text-blue-300 font-bold">{stat.chips}</div><div className="text-center font-mono text-red-400 font-bold">x{stat.mult}</div></div>))}</div></div>
+                </div>
+            </div>
+        );
+
+        // 新增：设置菜单组件
+        const SettingsModal = ({ onClose, onRestart, onMenu }) => {
+            const [viewRules, setViewRules] = useState(false);
+            if (viewRules) return <RuleModal onClose={() => setViewRules(false)} />;
+
             return (
-                <div className="flex flex-col items-center justify-center h-full bg-slate-900 text-white p-4">
-                    {/* 头像缩小到 w-20 (80px) */}
-                    <CapybaraAvatar className="w-20 h-20 sm:w-28 sm:h-28 mb-3" />
-                    
-                    {/* 标题缩小 */}
-                    <h1 className="text-2xl font-black mb-4 tracking-widest text-center">MTTTTT卡牌 系统</h1>
-                    
-                    <form onSubmit={handleSubmit} className="w-full max-w-xs flex flex-col gap-3">
-                        {/* 输入框和按钮高度压缩 */}
-                        <input 
-                            type="password" 
-                            value={input} 
-                            onChange={(e) => setInput(e.target.value)} 
-                            placeholder="请输入系统密钥" 
-                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg focus:outline-none focus:border-blue-500 transition-all shadow-inner" 
-                            autoFocus 
-                        />
-                        <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform">验证身份</button>
-                    </form>
-                    
-                    {error && <p className="mt-2 text-red-500 text-sm font-bold animate-pulse">{error}</p>}
+                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-slate-800 border border-slate-600 rounded-xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95">
+                        <h2 className="text-2xl font-bold text-white text-center mb-2 flex items-center justify-center gap-2"><Settings size={28}/> 设置</h2>
+                        <button onClick={() => setViewRules(true)} className="bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-slate-600 transition-colors"><HelpCircle size={20}/> 查看规则</button>
+                        <button onClick={() => { onRestart(); onClose(); }} className="bg-orange-600 hover:bg-orange-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-orange-400 shadow-lg shadow-orange-900/30 transition-colors"><RotateCcw size={20}/> 重开本局</button>
+                        <button onClick={() => { onMenu(); onClose(); }} className="bg-red-600 hover:bg-red-500 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-red-400 shadow-lg shadow-red-900/30 transition-colors"><Home size={20}/> 返回主菜单</button>
+                        <button onClick={onClose} className="mt-2 text-slate-400 hover:text-white text-sm">关闭菜单</button>
+                    </div>
                 </div>
             );
         };
 
-        // --- 主游戏应用 ---
+        // 新增：登录组件
+        const LoginScreen = ({ onLogin }) => {
+            const [input, setInput] = useState('');
+            const [error, setError] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                // 简单哈希校验：MT888 的哈希值是 73669169
+                if (simpleHash(input) === 73669169) {
+                    onLogin();
+                } else {
+                    setError('密码错误，请重试');
+                    setTimeout(() => setError(''), 2000);
+                }
+            };
+
+            return (
+                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900 text-white p-4">
+                    <CapybaraAvatar />
+                    <h1 className="text-3xl font-bold mb-6 tracking-wider">系统登录</h1>
+                    <form onSubmit={handleSubmit} className="w-full max-w-xs flex flex-col gap-4">
+                        <input 
+                            type="password" 
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder="请输入访问密码"
+                            className="bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-center text-lg focus:outline-none focus:border-blue-500 transition-colors"
+                            autoFocus
+                        />
+                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg active:scale-95 transition-all">
+                            进入系统
+                        </button>
+                    </form>
+                    {error && <div className="mt-4 text-red-400 text-sm animate-bounce">{error}</div>}
+                </div>
+            );
+        };
+
         function App() {
-            const [gameState, setGameState] = useState('login'); 
+            const [gameState, setGameState] = useState('login'); // 初始状态改为 login
             const [showSettings, setShowSettings] = useState(false); 
             const [showRunInfo, setShowRunInfo] = useState(false);
             const [showDeckView, setShowDeckView] = useState(false);
-            const [showRuleModal, setShowRuleModal] = useState(false);
-            const [showJokerCompendium, setShowJokerCompendium] = useState(false); 
+            const [confirmAction, setConfirmAction] = useState(null); 
             const [actionState, setActionState] = useState('idle');
             const [handStats, setHandStats] = useState(DEFAULT_HAND_STATS); 
             const [selectedDeck, setSelectedDeck] = useState(null); 
@@ -471,15 +524,21 @@
             const [maxJokers, setMaxJokers] = useState(5); 
             const [myJokers, setMyJokers] = useState([]);
             const [consumables, setConsumables] = useState([]); 
+            const maxConsumables = 2;
             const [shopJokers, setShopJokers] = useState([]);
             const [scoreBreakdown, setScoreBreakdown] = useState(null);
             const [message, setMessage] = useState('');
-            const maxConsumables = 2;
+
+            const handleLogin = () => {
+                setGameState('menu');
+            };
+
+            const startGame = () => setGameState('deck_select');
 
             const launchGame = (chosenDeck) => {
                 setSelectedDeck(chosenDeck);
                 setDeck(shuffle(createDeck(chosenDeck.type))); 
-                setHandStats(JSON.parse(JSON.stringify(DEFAULT_HAND_STATS))); // Deep copy
+                setHandStats(DEFAULT_HAND_STATS); 
                 setHand([]);
                 setRound(1);
                 setTargetScore(600);
@@ -488,15 +547,22 @@
                 setHandsLeft(chosenDeck.stats.hands);
                 setDiscardsLeft(chosenDeck.stats.discards);
                 setMaxJokers(chosenDeck.stats.maxJokers);
-                setMyJokers([]);
+                let startingJokers = [];
+                if (chosenDeck.bonus === 'random_jokers') {
+                    for(let i=0; i<2; i++) startingJokers.push({ ...JOKERS_DB[Math.floor(Math.random() * JOKERS_DB.length)], uid: generateUniqueId() });
+                }
+                setMyJokers(startingJokers);
                 setConsumables([]);
                 setGameState('playing');
                 setActionState('idle');
+                setMessage('');
             };
 
-            const restartGame = () => { if (selectedDeck) launchGame(selectedDeck); else setGameState('menu'); };
+            const restartGame = () => {
+                if (selectedDeck) launchGame(selectedDeck);
+                else setGameState('menu');
+            };
 
-            // 自动补牌 - 修正为10张
             useEffect(() => {
                 if (gameState === 'playing' && hand.length < 10 && deck.length > 0) {
                     const needed = 10 - hand.length;
@@ -506,12 +572,25 @@
                 }
             }, [gameState, hand.length, deck.length]);
 
+            const toggleSelect = (card) => {
+                if (gameState !== 'playing') return; 
+                if (card.selected) {
+                    // Deselect
+                    setHand(hand.map(c => c.id === card.id ? { ...c, selected: false } : c));
+                } else {
+                    // Select
+                    const selectedCount = hand.filter(c => c.selected).length;
+                    if (selectedCount >= 5) return; 
+                    setHand(hand.map(c => c.id === card.id ? { ...c, selected: true } : c));
+                }
+            };
+
             const selectedCards = useMemo(() => hand.filter(c => c.selected), [hand]);
-            const currentHandType = useMemo(() => detectHandType(selectedCards), [selectedCards]);
             const currentHandInfo = useMemo(() => {
-                if (!currentHandType) return { name: '请选牌', level: 0, chips: 0, mult: 0 };
-                return { type: currentHandType, ...handStats[currentHandType] }; 
-            }, [currentHandType, handStats]);
+                const type = detectHandType(selectedCards);
+                if (!type) return { name: '请选牌', level: 0, chips: 0, mult: 0 };
+                return { type, ...handStats[type] }; 
+            }, [selectedCards, handStats]);
 
             const calculateScore = useCallback((cards, jokers, baseInfo) => {
                 if (!baseInfo || baseInfo.chips === undefined) return { totalChips: 0, totalMult: 0, totalScore: 0, triggers: [] };
@@ -520,9 +599,11 @@
                 let cardChips = 0;
                 cards.forEach(c => {
                     let val = c.value;
-                    if (c.enhance === 'bonus') val += 30; 
+                    if (c.enhance === 'bonus') val += 30;
+                    if (c.enhance === 'stone') val = 50; 
                     cardChips += val;
-                    if (c.enhance === 'mult') mult += 4; if (c.enhance === 'glass') mult *= 2; 
+                    if (c.enhance === 'mult') mult += 4;
+                    if (c.enhance === 'glass') mult *= 2; 
                 });
                 let jokerLog = [];
                 jokers.forEach(j => {
@@ -537,18 +618,29 @@
                     if (triggered) jokerLog.push(j.name);
                 });
                 const steelCards = hand.filter(c => !c.selected && c.enhance === 'steel');
-                if (steelCards.length > 0) { steelCards.forEach(() => { mult *= 1.5; }); jokerLog.push(`钢铁卡x${steelCards.length}`); }
+                if (steelCards.length > 0) {
+                    steelCards.forEach(() => { mult *= 1.5; });
+                    jokerLog.push(`钢铁卡x${steelCards.length}`);
+                }
                 return { totalChips: chips + cardChips, totalMult: mult, totalScore: Math.floor((chips + cardChips) * mult), triggers: jokerLog };
             }, [discardsLeft, hand, selectedDeck]);
 
             const previewData = useMemo(() => calculateScore(selectedCards, myJokers, currentHandInfo), [selectedCards, myJokers, currentHandInfo, calculateScore]);
 
-            const playHand = () => {
+            const playHand = async () => {
                 if (selectedCards.length === 0 || handsLeft <= 0) return;
                 setActionState('scoring');
                 setGameState('scoring');
                 const result = previewData;
-                setScoreBreakdown({ name: currentHandInfo.name, baseChips: currentHandInfo.chips, cardChips: result.totalChips - currentHandInfo.chips, baseMult: currentHandInfo.mult, finalMult: result.totalMult, total: result.totalScore, jokersTriggered: result.triggers });
+                setScoreBreakdown({
+                    name: currentHandInfo.name, 
+                    baseChips: currentHandInfo.chips,
+                    cardChips: result.totalChips - currentHandInfo.chips,
+                    baseMult: currentHandInfo.mult,
+                    finalMult: result.totalMult,
+                    total: result.totalScore,
+                    jokersTriggered: result.triggers
+                });
                 setTimeout(() => {
                     const newScore = currentScore + result.totalScore;
                     setCurrentScore(newScore);
@@ -565,7 +657,11 @@
             const discardHand = () => {
                 if (selectedCards.length === 0 || discardsLeft <= 0 || actionState !== 'idle') return;
                 setActionState('discarding');
-                setTimeout(() => { setHand(prev => prev.filter(c => !c.selected)); setDiscardsLeft(prev => prev - 1); setActionState('idle'); }, 500); 
+                setTimeout(() => {
+                    setHand(prev => prev.filter(c => !c.selected));
+                    setDiscardsLeft(prev => prev - 1);
+                    setActionState('idle'); 
+                }, 500); 
             };
 
             const winRound = () => {
@@ -577,13 +673,15 @@
                 let reward = 3 + handsLeft + interest + goldMoney;
                 if (selectedDeck.id === 'green') reward += handsLeft * 1; 
                 setMoney(prev => prev + reward);
-                
-                // 生成商店物品
                 const shopItems = [];
                 for(let i=0; i<5; i++) { 
                     const rand = Math.random();
                     let pool;
-                    if (rand < 0.15) pool = PLANETS_DB; else if (rand < 0.3) pool = TAROTS_DB; else if (rand < 0.35) pool = SPECTRAL_DB; else if (rand < 0.45) pool = ENHANCED_CARDS_DB; else pool = JOKERS_DB;
+                    if (rand < 0.15) pool = PLANETS_DB;
+                    else if (rand < 0.3) pool = TAROTS_DB;
+                    else if (rand < 0.35) pool = SPECTRAL_DB;
+                    else if (rand < 0.45) pool = ENHANCED_CARDS_DB;
+                    else pool = JOKERS_DB;
                     shopItems.push({ ...pool[Math.floor(Math.random() * pool.length)], uid: generateUniqueId() });
                 }
                 setShopJokers(shopItems);
@@ -609,23 +707,37 @@
                         if (consumables.length < maxConsumables) {
                             setMoney(m => m - item.cost);
                             setConsumables([...consumables, item]);
-                            const newShop = [...shopJokers]; newShop.splice(idx, 1); setShopJokers(newShop);
-                        } else setMessage("消耗品槽位已满！");
+                            removeItemFromShop(idx);
+                        } else showMessage("消耗品槽位已满！");
                     } else if (item.type === 'playing_card') {
                         setMoney(m => m - item.cost);
-                        setDeck(prev => [...prev, { id: generateUniqueId(), suit: item.suit, rankLabel: RANKS.find(r => r.value === (item.rank === 12 ? 11 : item.rank) || r.label === (item.rank === 12 ? 'A' : '')).label, value: item.rank === 12 ? 11 : item.rank, rankIndex: item.rank, selected: false, enhance: item.enhance }]);
-                        const newShop = [...shopJokers]; newShop.splice(idx, 1); setShopJokers(newShop);
-                        setMessage("卡牌已加入牌组");
+                        setDeck(prev => [...prev, {
+                            id: generateUniqueId(),
+                            suit: item.suit,
+                            rankLabel: RANKS.find(r => r.value === (item.rank === 12 ? 11 : item.rank) || r.label === (item.rank === 12 ? 'A' : '')).label, 
+                            value: item.rank === 12 ? 11 : item.rank, 
+                            rankIndex: item.rank, 
+                            selected: false,
+                            enhance: item.enhance
+                        }]);
+                        removeItemFromShop(idx);
+                        showMessage("卡牌已加入牌组");
                     } else {
                         if (myJokers.length < maxJokers) {
                              setMoney(m => m - item.cost);
                              setMyJokers([...myJokers, { ...item, uid: generateUniqueId() }]);
-                             const newShop = [...shopJokers]; newShop.splice(idx, 1); setShopJokers(newShop);
-                        } else setMessage("MT槽位已满！");
+                             removeItemFromShop(idx);
+                        } else showMessage("MT槽位已满！");
                     }
                 }
             };
-            
+
+            const removeItemFromShop = (idx) => {
+                const newShop = [...shopJokers];
+                newShop.splice(idx, 1);
+                setShopJokers(newShop);
+            };
+
             const useConsumable = (item) => {
                 if (item.type === 'planet') {
                     setHandStats(prev => {
@@ -633,16 +745,16 @@
                         const current = prev[target];
                         return { ...prev, [target]: { ...current, level: current.level + 1, chips: current.chips + item.chipsMod, mult: current.mult + item.multMod } };
                     });
-                    setMessage(`升级成功！${item.desc}`);
+                    showMessage(`升级成功！${item.desc}`);
                 } else if (item.effect === 'money') {
                     setMoney(m => Math.min(m + item.amount, m * 2)); 
-                    setMessage("获得金钱！");
+                    showMessage("获得金钱！");
                 } else if (item.effect === 'enhance') {
-                    if (selectedCards.length === 0 || selectedCards.length > item.maxCards) { setMessage(`请选择 ${item.maxCards} 张牌使用`); return; }
+                    if (selectedCards.length === 0 || selectedCards.length > item.maxCards) { showMessage(`请选择 ${item.maxCards} 张牌使用`); return; }
                     setHand(prev => prev.map(c => c.selected ? { ...c, enhance: item.enhanceType, selected: false } : c));
-                    setMessage("卡牌已增强！");
+                    showMessage("卡牌已增强！");
                 } else if (item.effect === 'destroy_hand_money') {
-                    if (hand.length < item.count) { setMessage("手牌不足！"); return; }
+                    if (hand.length < item.count) { showMessage("手牌不足！"); return; }
                     let indicesToRemove = [];
                     while(indicesToRemove.length < item.count) {
                         let r = Math.floor(Math.random() * hand.length);
@@ -650,171 +762,153 @@
                     }
                     setHand(prev => prev.filter((_, i) => !indicesToRemove.includes(i)));
                     setMoney(m => m + item.amount);
-                    setMessage("献祭成功！");
-                } else if (item.effect === 'copy') {
-                    if (selectedCards.length === 0 || selectedCards.length > 2) { setMessage(`请选择最多2张牌复制`); return; }
-                    const newCards = selectedCards.map(c => ({...c, id: generateUniqueId(), selected: false}));
-                    setHand(prev => [...prev, ...newCards]);
-                    setMessage("复制成功！");
+                    showMessage("献祭成功！");
                 }
                 setConsumables(prev => prev.filter(c => c.uid !== item.uid));
             };
 
-            const sellItem = (item) => {
-                setMoney(m => m + Math.floor(item.cost / 2));
-                if (myJokers.some(j => j.uid === item.uid)) setMyJokers(prev => prev.filter(j => j.uid !== item.uid));
-                else setConsumables(prev => prev.filter(c => c.uid !== item.uid));
+            const requestRemoveItem = (item) => setConfirmAction({ item, type: 'remove' });
+
+            const confirmRemoveItem = (item) => {
+                if (myJokers.some(j => j.uid === item.uid)) {
+                    setMoney(m => m + Math.floor(item.cost / 2));
+                    setMyJokers(prev => prev.filter(j => j.uid !== item.uid));
+                } else if (consumables.some(c => c.uid === item.uid)) {
+                    setMoney(m => m + Math.floor(item.cost / 2));
+                    setConsumables(prev => prev.filter(c => c.uid !== item.uid));
+                }
+                setConfirmAction(null);
             };
 
-            const toggleSelect = (card) => {
-                if (actionState !== 'idle') return;
-                // Optional: Enforce max selection (5 cards)
-                if (!card.selected && hand.filter(c => c.selected).length >= 5) return;
-                setHand(hand.map(c => c.id === card.id ? { ...c, selected: !c.selected } : c));
-            };
+            const showMessage = (msg) => { setMessage(msg); setTimeout(() => setMessage(''), 1500); };
 
-            // 登录界面 (密码: MT888 -> 73669169)
-            if (gameState === 'login') return <LoginScreen onLogin={() => setGameState('menu')} />;
+            const shopJokersList = useMemo(() => shopJokers.filter(item => item.type === 'add_mult' || item.type.includes('mult') || item.type.includes('chips') || item.type === 'card_specific' || item.type === 'discard_bonus' || item.type === 'count_less'), [shopJokers]);
+            const shopOthersList = useMemo(() => shopJokers.filter(item => !shopJokersList.includes(item)), [shopJokers, shopJokersList]);
 
-            // 主菜单
-            if (gameState === 'menu') return (
-                <div className="flex flex-col items-center justify-center h-full bg-slate-900 p-6 text-center">
-                    <CapybaraAvatar />
-                    <h1 className="text-4xl font-black text-white mb-12">主菜单</h1>
-                    <button onClick={() => setGameState('deck_select')} className="bg-blue-600 text-white px-12 py-4 rounded-2xl font-bold text-xl shadow-xl active:scale-95 transition-all flex items-center gap-2"><Icons.Play className="w-6 h-6" fill="currentColor"/> 开始新局</button>
-                </div>
-            );
-
-            // 选组
-            if (gameState === 'deck_select') return (
-                <div className="flex flex-col items-center h-full bg-slate-900 p-6 overflow-y-auto hide-scrollbar">
-                    <h1 className="text-4xl font-black text-white mt-4 mb-8">选择你的初始卡组</h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl pb-10">
-                        {DECKS.map(d => (
-                            <div key={d.id} onClick={() => launchGame(d)} className={`cursor-pointer group relative bg-gradient-to-br ${d.color} p-8 rounded-[2rem] border-2 border-white/10 shadow-2xl hover:scale-[1.02] transition-all active:scale-95`}>
-                                <div className="absolute top-4 right-4 opacity-20"><Icons.Layers className="w-24 h-24"/></div>
-                                <h3 className="text-3xl font-bold text-white mb-2 relative z-10">{d.name}</h3>
-                                <p className="text-white/80 mb-6 text-sm h-10 leading-relaxed relative z-10">{d.desc}</p>
-                                <div className="flex flex-wrap gap-2 relative z-10">
-                                    <span className="bg-black/30 px-3 py-1 rounded-full text-xs font-bold text-blue-200">出牌: {d.stats.hands}</span>
-                                    <span className="bg-black/30 px-3 py-1 rounded-full text-xs font-bold text-red-200">弃牌: {d.stats.discards}</span>
-                                    <span className="bg-black/30 px-3 py-1 rounded-full text-xs font-bold text-yellow-200">金钱: ${d.stats.money}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={() => setGameState('menu')} className="mt-auto mb-4 text-slate-400 hover:text-white flex items-center gap-2"><Icons.Rotate className="w-5 h-5"/> 返回主菜单</button>
-                </div>
-            );
-            
-            // 商店
-            if (gameState === 'shop') return (
-                 <div className="absolute inset-0 z-40 flex flex-col items-center bg-slate-800 rounded-xl p-4 sm:p-6 border-4 border-yellow-600/30 overflow-y-auto w-full h-full">
-                    <div className="flex justify-between w-full items-center mb-6 border-b border-slate-700 pb-4 sticky top-0 bg-slate-800 z-10"><h2 className="text-2xl sm:text-3xl font-bold text-yellow-500 flex items-center gap-2"><Icons.ShoppingBag className="w-8 h-8"/> 商店</h2><div className="text-lg sm:text-xl font-mono bg-slate-900 px-4 py-1 rounded text-yellow-400">拥有: ${money}</div></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full flex-1">
-                        <div className="flex flex-col gap-4">
-                            <div className="text-slate-400 font-bold uppercase tracking-wider text-sm border-b border-slate-700 pb-2">道具区 (MT牌)</div>
-                            <div className="flex flex-wrap gap-4">{shopJokers.filter(i=>i.type.includes('mult')||i.type.includes('chips')||i.type.includes('bonus')).length > 0 ? shopJokers.filter(i=>i.type.includes('mult')||i.type.includes('chips')||i.type.includes('bonus')).map((item, idx) => (<div key={item.uid} className="flex flex-col gap-2 items-center bg-slate-700/30 p-2 rounded-lg"><JokerCard joker={item} /><button onClick={() => buyItem(item, idx)} disabled={money < item.cost} className={`w-full py-2 rounded text-sm font-bold shadow-md active:scale-95 transition-transform ${money >= item.cost ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>${item.cost} 购买</button></div>)) : <div className="text-slate-600 italic p-4">无道具</div>}</div>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                            <div className="text-slate-400 font-bold uppercase tracking-wider text-sm border-b border-slate-700 pb-2">补给区 (消耗品)</div>
-                            <div className="flex flex-wrap gap-4">{shopJokers.filter(i=>!i.type.includes('mult')&&!i.type.includes('chips')&&!i.type.includes('bonus')).length > 0 ? shopJokers.filter(i=>!i.type.includes('mult')&&!i.type.includes('chips')&&!i.type.includes('bonus')).map((item, idx) => (<div key={item.uid} className="flex flex-col gap-2 items-center bg-slate-700/30 p-2 rounded-lg"><JokerCard joker={item} /><button onClick={() => buyItem(item, idx)} disabled={money < item.cost} className={`w-full py-2 rounded text-sm font-bold shadow-md active:scale-95 transition-transform ${money >= item.cost ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>${item.cost} 购买</button></div>)) : <div className="text-slate-600 italic p-4">无补给</div>}</div>
-                        </div>
-                    </div>
-                    <button onClick={nextRound} className="mt-8 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold py-4 px-12 rounded-xl text-xl shadow-lg transition-all flex items-center gap-2 w-full sm:w-auto justify-center mb-4">下一回合 <Icons.Play className="w-6 h-6" fill="currentColor"/></button>
-                    {message && <div className="fixed top-24 bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold shadow-xl animate-bounce z-50">{message}</div>}
-                </div>
-            );
-
-            // 游戏结束
-            if (gameState === 'gameover') return (
-                <div className="absolute inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-500">
-                    <h2 className="text-7xl font-black text-red-600 mb-8 tracking-tighter">败北</h2>
-                    <p className="text-slate-400 mb-8">最终回合: {round} - 分数: {currentScore}</p>
-                    <button onClick={() => setGameState('menu')} className="bg-white text-black px-12 py-5 rounded-2xl font-black text-xl hover:bg-gray-200 transition-colors flex items-center gap-2"><Icons.Rotate className="w-6 h-6"/> 回到现实</button>
-                </div>
-            );
-
-            // 战斗界面
             return (
-                <div className="flex flex-col h-full bg-slate-900 overflow-hidden font-sans w-full">
-                    {/* 弹窗 */}
-                    {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onRestart={restartGame} onMenu={() => setGameState('menu')} onShowRules={() => { setShowSettings(false); setShowRuleModal(true); }} onShowJokerCompendium={() => { setShowSettings(false); setShowJokerCompendium(true); }} />}
-                    {showRunInfo && <RunInfoModal handStats={handStats} onClose={() => setShowRunInfo(false)} />}
-                    {showDeckView && <DeckViewModal deck={deck} onClose={() => setShowDeckView(false)} />}
-                    {showRuleModal && <RuleModal onClose={() => setShowRuleModal(false)} />}
-                    {showJokerCompendium && <ProductCompendiumModal onClose={() => setShowJokerCompendium(false)} />}
-                    
-                    {/* 顶部栏 */}
-                    <div className="w-full bg-slate-800 p-2 sm:p-3 shadow-lg border-b border-slate-700 z-10 flex flex-col gap-2">
-                        <div className="flex justify-between items-center">
-                            <div className="flex gap-2">
-                                <button onClick={() => setShowSettings(true)} className="bg-slate-700 text-white px-2 py-1 rounded text-xs font-bold flex gap-1"><Icons.Settings className="w-4 h-4"/> 设置</button>
-                                <button onClick={() => setShowRunInfo(true)} className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold flex gap-1"><Icons.BarChart className="w-4 h-4"/> 信息</button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={() => setShowDeckView(true)} className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold flex gap-1"><Icons.Eye className="w-4 h-4"/> 牌组</button>
-                                <span className="text-xs text-slate-400">底注 <span className="text-orange-400 font-bold">#{round}</span></span>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-end relative">
-                            <div className="flex flex-col"><span className="text-[10px] text-slate-400 uppercase">得分</span><div className="text-2xl font-mono font-black leading-none">{Math.floor(currentScore).toLocaleString()} <span className="text-sm text-slate-500">/ {Math.floor(targetScore).toLocaleString()}</span></div></div>
-                            {/* 2. 优化：计分预览框放大 */}
-                            {currentHandType && selectedCards.length > 0 && (
-                                <div className="absolute left-1/2 -translate-x-1/2 -translate-y-4 bg-slate-900 border-2 border-indigo-500 px-6 py-2 rounded-xl shadow-2xl flex flex-col items-center min-w-[200px] z-20">
-                                    <div className="text-xs text-indigo-300 font-bold uppercase tracking-widest">{HAND_NAMES[currentHandType]} <span className="text-indigo-500">Lv.{currentHandInfo.level}</span></div>
-                                    <div className="font-mono font-black leading-none text-3xl mt-1"><span className="text-blue-400">{previewData.totalChips}</span> X <span className="text-red-400">{previewData.totalMult}</span></div>
+                <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-blue-500 selection:text-white flex flex-col items-center justify-start p-2 sm:p-4 overflow-y-auto">
+                
+                {gameState === 'login' && <LoginScreen onLogin={handleLogin} />}
+
+                {gameState !== 'login' && (
+                    <>
+                        {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onRestart={restartGame} onMenu={() => setGameState('menu')} />}
+                        {showRunInfo && <RunInfoModal handStats={handStats} onClose={() => setShowRunInfo(false)} />}
+                        {showDeckView && <DeckViewModal deck={deck} onClose={() => setShowDeckView(false)} />}
+                        {confirmAction && <ConfirmModal item={confirmAction.item} onConfirm={confirmRemoveItem} onCancel={() => setConfirmAction(null)} />}
+
+                        {gameState !== 'menu' && gameState !== 'deck_select' && (
+                            <div className="w-full max-w-4xl bg-slate-800 p-3 rounded-xl shadow-lg border border-slate-700 z-10 relative mb-2 flex flex-col gap-3">
+                                <div className="flex justify-between items-center border-b border-slate-700 pb-2">
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setShowSettings(true)} className="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-md flex items-center gap-1.5 transition-transform active:scale-95"><Settings size={16}/> 设置</button>
+                                        <button onClick={() => setShowRunInfo(true)} className="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-md flex items-center gap-1.5 transition-transform active:scale-95"><BarChart3 size={16}/> 比赛信息</button>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={() => setShowDeckView(true)} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-md flex items-center gap-1.5 transition-transform active:scale-95"><Eye size={16}/> 查看牌组</button>
+                                        <span className="text-xs text-slate-400">底注等级</span><span className="text-lg font-bold text-orange-400 bg-orange-900/30 px-2 rounded border border-orange-500/30">#{round}</span>
+                                    </div>
                                 </div>
-                            )}
-                            <div className="flex items-center gap-3">
-                                <div className="flex flex-col items-center"><span className="text-[10px] text-blue-400">出牌</span><span className="text-lg font-bold">{handsLeft}</span></div>
-                                <div className="flex flex-col items-center"><span className="text-[10px] text-red-400">弃牌</span><span className="text-lg font-bold">{discardsLeft}</span></div>
-                                <div className="flex flex-col items-center bg-yellow-900/30 px-2 py-0.5 rounded border border-yellow-700/50"><span className="text-[10px] text-yellow-500 flex items-center gap-1"><Icons.ShoppingBag className="w-3 h-3"/> 金钱</span><span className="text-lg font-bold text-yellow-400">${money}</span></div>
-                            </div>
-                        </div>
-                        <div className="w-full h-1 bg-slate-700/50 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-blue-500 to-red-500 transition-all duration-500" style={{ width: `${Math.min((currentScore / targetScore) * 100, 100)}%` }} /></div>
-                    </div>
-
-                    {/* MT/消耗品栏 */}
-                    <div className="w-full flex gap-2 p-2 bg-slate-900">
-                        <div className="flex-1 h-24 flex items-center justify-start gap-2 p-2 rounded-xl border border-dashed border-slate-700 bg-slate-800/50 overflow-x-auto hide-scrollbar">
-                            {myJokers.length === 0 && <span className="text-slate-600 text-xs w-full text-center">暂无MT (上限:{maxJokers})</span>}
-                            {myJokers.map(joker => <JokerCard key={joker.uid} joker={joker} onSell={sellItem} />)}
-                        </div>
-                        <div className="w-1/3 h-24 flex items-center justify-start gap-2 p-2 rounded-xl border border-dashed border-blue-900/50 bg-slate-800/50 overflow-x-auto hide-scrollbar">
-                            {consumables.length === 0 && <span className="text-slate-600 text-xs w-full text-center">消耗品 ({consumables.length}/{maxConsumables})</span>}
-                            {consumables.map(item => (<div key={item.uid} className="relative group flex-shrink-0"><JokerCard joker={item} onSell={sellItem} /><button onClick={() => useConsumable(item)} className="absolute bottom-0 left-0 w-full bg-blue-600 text-[8px] text-white opacity-0 group-hover:opacity-100 transition-opacity">使用</button></div>))}
-                        </div>
-                    </div>
-
-                    {/* 游戏主区域 */}
-                    <div className="flex-1 relative flex flex-col items-center justify-center p-2 w-full overflow-hidden">
-                        {/* 计分展示动画 */}
-                        {gameState === 'scoring' && scoreBreakdown && (
-                            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-xl animate-in fade-in zoom-in duration-300">
-                                <div className="text-3xl font-bold text-white mb-2">{scoreBreakdown.name}</div>
-                                <div className="flex items-center gap-2 text-2xl font-mono mb-4"><div className="bg-blue-600 px-3 py-1 rounded text-white">{scoreBreakdown.baseChips + scoreBreakdown.cardChips}</div><Icons.XCircle className="w-6 h-6 text-slate-400"/><div className="bg-red-600 px-3 py-1 rounded text-white">{scoreBreakdown.finalMult}</div></div>
-                                <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-sm">{scoreBreakdown.total}</div>
+                                <div className="flex justify-between items-end relative">
+                                    <div className="flex flex-col"><span className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">本轮分数</span><div className="text-2xl sm:text-3xl font-bold font-mono tracking-tighter leading-none">{Math.floor(currentScore).toLocaleString()} <span className="text-sm text-slate-500 mx-1">/</span> <span className="text-lg sm:text-xl text-red-400">{Math.floor(targetScore).toLocaleString()}</span></div></div>
+                                    <div className={`transition-all duration-300 transform origin-right ${selectedCards.length > 0 ? 'w-auto opacity-100 translate-x-0' : 'w-0 opacity-0 translate-x-4 overflow-hidden'}`}>
+                                        <div className="bg-slate-900 border-2 border-indigo-500 rounded-lg shadow-[0_0_15px_rgba(99,102,241,0.4)] px-3 py-1 flex flex-col items-center justify-center min-w-[100px] whitespace-nowrap mr-2">
+                                            <div className="text-[10px] text-indigo-300 font-bold uppercase tracking-wider mb-0.5 text-center">{currentHandInfo.name} <span className="text-indigo-500">Lv.{currentHandInfo.level}</span></div>
+                                            <div className="flex items-center gap-1.5 font-mono leading-none">
+                                                <span className="text-blue-400 font-bold text-lg">{previewData.totalChips}</span><span className="text-[10px] text-slate-500">X</span><span className="text-red-400 font-bold text-lg">{previewData.totalMult}</span>
+                                            </div>
+                                        </div>
+                                     </div>
+                                    <div className="flex items-center gap-3 sm:gap-6"><div className="flex flex-col items-center"><span className="text-[10px] text-blue-300">出牌</span><span className="text-lg sm:text-xl font-bold text-blue-400">{handsLeft}</span></div><div className="flex flex-col items-center"><span className="text-[10px] text-red-300">弃牌</span><span className="text-lg sm:text-xl font-bold text-red-400">{discardsLeft}</span></div><div className="flex flex-col items-center bg-yellow-900/30 px-3 py-1 rounded-lg border border-yellow-700/50 min-w-[60px]"><span className="text-[10px] text-yellow-500 flex items-center gap-1"><ShoppingBag size={10}/> 金钱</span><span className="text-lg sm:text-xl font-bold text-yellow-400">${money}</span></div></div>
+                                </div>
                             </div>
                         )}
-                        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 w-full px-1">
-                            {hand.map(card => <Card key={card.id} card={card} onClick={(c) => toggleSelect(c)} animationState={actionState} />)}
-                        </div>
-                        
-                        {/* 排序按钮 */}
-                        <div className="flex gap-2 mt-4 w-full max-w-md px-4">
-                             <button onClick={() => setHand(prev => [...prev].sort((a,b) => b.rankIndex - a.rankIndex))} className="flex-1 bg-slate-800 text-slate-400 py-2 rounded text-xs border border-slate-700">按点数</button>
-                             <button onClick={() => setHand(prev => [...prev].sort((a,b) => a.suit.localeCompare(b.suit)))} className="flex-1 bg-slate-800 text-slate-400 py-2 rounded text-xs border border-slate-700">按花色</button>
-                        </div>
-                    </div>
 
-                    {/* 底部动作栏 */}
-                    <div className="p-3 bg-slate-800/80 flex gap-3 border-t border-slate-700 w-full">
-                        <button onClick={playHand} disabled={selectedCards.length === 0 || gameState === 'scoring'} className={`flex-1 py-4 rounded-xl font-black text-xl shadow-lg transition-all ${selectedCards.length > 0 ? 'bg-orange-500 text-white shadow-orange-500/30 active:scale-95' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>出牌</button>
-                        <button onClick={discardHand} disabled={selectedCards.length === 0 || discardsLeft <= 0 || gameState === 'scoring'} className={`flex-1 py-4 rounded-xl font-black text-xl transition-all ${selectedCards.length > 0 && discardsLeft > 0 ? 'bg-red-600 text-white active:scale-95 shadow-lg shadow-red-900/20' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>弃牌</button>
-                    </div>
+                        {/* MT 槽位等 */}
+                        {gameState !== 'menu' && gameState !== 'deck_select' && (
+                            <div className="w-full max-w-4xl flex gap-2 mb-2">
+                                <div className="flex-1 h-28 sm:h-32 flex items-center justify-start gap-2 p-2 rounded-xl border-2 border-dashed border-slate-700/50 bg-slate-800/50 overflow-x-auto hide-scrollbar">
+                                    {myJokers.length === 0 && <span className="text-slate-600 text-sm w-full text-center">暂无MT <br/> <span className="text-xs">上限: {maxJokers}</span></span>}
+                                    {myJokers.map((joker) => <JokerCard key={joker.uid} joker={joker} onSell={requestRemoveItem} />)}
+                                </div>
+                                <div className="w-1/3 h-28 sm:h-32 flex items-center justify-start gap-2 p-2 rounded-xl border-2 border-dashed border-blue-900/50 bg-slate-800/50 overflow-x-auto hide-scrollbar">
+                                    {consumables.length === 0 && <span className="text-slate-600 text-sm w-full text-center">消耗品 <br/> <span className="text-xs">{consumables.length}/{maxConsumables}</span></span>}
+                                    {consumables.map((item) => (<div key={item.uid} className="relative group"><JokerCard joker={item} onSell={requestRemoveItem} /><button onClick={() => useConsumable(item)} className="absolute bottom-0 left-0 w-full bg-blue-600 text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">使用</button></div>))}
+                                </div>
+                            </div>
+                        )}
 
-                    {message && <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-black px-8 py-4 rounded-2xl font-black text-xl shadow-2xl z-[100] animate-bounce border-2 border-white pointer-events-none whitespace-nowrap">{message}</div>}
+                        <div className="relative w-full max-w-5xl flex-1 flex flex-col items-center justify-center min-h-[350px] sm:min-h-[400px]">
+                            {gameState === 'scoring' && scoreBreakdown && (
+                                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm rounded-xl animate-in fade-in zoom-in duration-300 p-4">
+                                    <div className="text-3xl sm:text-4xl font-bold text-white mb-2">{scoreBreakdown.name}</div>
+                                    <div className="flex items-center gap-2 sm:gap-4 text-xl sm:text-2xl font-mono mb-6"><div className="bg-blue-600 px-3 py-1 rounded-lg text-white">{scoreBreakdown.baseChips + scoreBreakdown.cardChips}</div><XCircle size={20} className="text-slate-400"/><div className="bg-red-600 px-3 py-1 rounded-lg text-white">{scoreBreakdown.finalMult}</div></div>
+                                    <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-sm mb-4">{scoreBreakdown.total}</div>
+                                    {scoreBreakdown.jokersTriggered.length > 0 && <div className="text-xs sm:text-sm text-yellow-200/80 mt-2 text-center">触发: {scoreBreakdown.jokersTriggered.join(', ')}</div>}
+                                </div>
+                            )}
+
+                            {gameState === 'menu' && (
+                                <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-slate-900/95 rounded-xl text-center px-4">
+                                    <CapybaraAvatar />
+                                    <h1 className="text-3xl sm:text-4xl font-black text-white mb-2 tracking-tighter">MTTTTT卡牌</h1>
+                                    <p className="text-slate-400 mb-8 text-sm">点击下方开始你的卡牌之旅</p>
+                                    <button onClick={startGame} className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-12 rounded-full text-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                                        <Play fill="currentColor" /> 开始游戏
+                                    </button>
+                                </div>
+                            )}
+
+                            {gameState === 'deck_select' && (
+                                <div className="absolute inset-0 z-40 flex flex-col items-center bg-slate-900 p-4 overflow-y-auto">
+                                    <h2 className="text-3xl font-bold text-white mb-6 mt-4 flex items-center gap-2"><Layers/> 选择你的卡组</h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-5xl pb-8">{DECKS.map((deck) => (<div key={deck.id} onClick={() => launchGame(deck)} className={`relative cursor-pointer group overflow-hidden rounded-xl border-2 p-6 transition-all duration-300 hover:scale-[1.02] active:scale-95 bg-gradient-to-br shadow-xl ${deck.color}`}><div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><Layers size={100} /></div><h3 className="text-2xl font-bold text-white mb-2 relative z-10">{deck.name}</h3><p className="text-white/90 text-sm mb-4 min-h-[40px] relative z-10">{deck.desc}</p><div className="flex flex-wrap gap-2 relative z-10"><span className="bg-black/30 px-2 py-1 rounded text-xs font-mono text-blue-200">出牌: {deck.stats.hands}</span><span className="bg-black/30 px-2 py-1 rounded text-xs font-mono text-red-200">弃牌: {deck.stats.discards}</span><span className="bg-black/30 px-2 py-1 rounded text-xs font-mono text-yellow-200">金钱: ${deck.stats.money}</span><span className="bg-black/30 px-2 py-1 rounded text-xs font-mono text-purple-200">MT槽: {deck.stats.maxJokers}</span></div></div>))}</div>
+                                    <button onClick={() => setGameState('menu')} className="mt-auto mb-8 text-slate-400 hover:text-white flex items-center gap-2"><RotateCcw size={16}/> 返回主菜单</button>
+                                </div>
+                            )}
+
+                            {gameState === 'gameover' && (
+                                <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/95 rounded-xl">
+                                    <h1 className="text-5xl font-bold text-red-500 mb-4">游戏结束</h1><p className="text-slate-300 mb-6">最终回合: {round} - 分数: {currentScore}</p><button onClick={() => setGameState('menu')} className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-lg transition-all active:scale-95"><RotateCcw size={18}/> 返回菜单</button>
+                                </div>
+                            )}
+
+                            {gameState === 'shop' && (
+                                <div className="absolute inset-0 z-40 flex flex-col items-center bg-slate-800 rounded-xl p-4 sm:p-6 border-4 border-yellow-600/30 overflow-y-auto">
+                                    <div className="flex justify-between w-full items-center mb-6 border-b border-slate-700 pb-4 sticky top-0 bg-slate-800 z-10"><h2 className="text-2xl sm:text-3xl font-bold text-yellow-500 flex items-center gap-2"><ShoppingBag/> 商店</h2><div className="text-lg sm:text-xl font-mono bg-slate-900 px-4 py-1 rounded text-yellow-400">拥有: ${money}</div></div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl flex-1">
+                                        <div className="flex flex-col gap-4">
+                                            <div className="text-slate-400 font-bold uppercase tracking-wider text-sm border-b border-slate-700 pb-2">道具区 (MT牌)</div>
+                                            <div className="flex flex-wrap gap-4">{shopJokersList.length > 0 ? shopJokersList.map((item, idx) => (<div key={item.uid} className="flex flex-col gap-2 items-center bg-slate-700/30 p-2 rounded-lg"><JokerCard joker={item} /><button onClick={() => buyItem(item, 0)} disabled={money < item.cost} className={`w-full py-2 rounded text-sm font-bold shadow-md active:scale-95 transition-transform ${money >= item.cost ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>${item.cost} 购买</button></div>)) : <div className="text-slate-600 italic p-4">本轮无道具出售</div>}</div>
+                                        </div>
+                                        <div className="flex flex-col gap-4">
+                                            <div className="text-slate-400 font-bold uppercase tracking-wider text-sm border-b border-slate-700 pb-2">补给区 (星球/塔罗/幻灵/卡牌)</div>
+                                            <div className="flex flex-wrap gap-4">{shopOthersList.length > 0 ? shopOthersList.map((item, idx) => (<div key={item.uid} className="flex flex-col gap-2 items-center bg-slate-700/30 p-2 rounded-lg"><JokerCard joker={item} /><button onClick={() => buyItem(item, 0)} disabled={money < item.cost} className={`w-full py-2 rounded text-sm font-bold shadow-md active:scale-95 transition-transform ${money >= item.cost ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>${item.cost} 购买</button></div>)) : <div className="text-slate-600 italic p-4">本轮无补给品出售</div>}</div>
+                                        </div>
+                                    </div>
+                                    <button onClick={nextRound} className="mt-8 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold py-4 px-12 rounded-xl text-xl shadow-lg transition-all flex items-center gap-2 w-full sm:w-auto justify-center">下一回合 <Play size={24} fill="currentColor"/></button>
+                                </div>
+                            )}
+
+                            {(gameState === 'playing' || gameState === 'scoring') && (
+                                <>
+                                    <div className="grid grid-cols-5 gap-2 px-2 pb-4 pt-4 w-full max-w-lg mx-auto">
+                                        {hand.map((card) => <Card key={card.id} card={card} onClick={toggleSelect} animationState={actionState} />)}
+                                    </div>
+                                    <div className="mt-auto sm:mt-8 w-full flex gap-3 px-2 pb-2">
+                                        <button onClick={playHand} disabled={selectedCards.length === 0 || gameState === 'scoring'} className={`flex-1 py-4 rounded-xl font-bold text-lg shadow-lg transition-all transform active:scale-95 ${selectedCards.length > 0 ? 'bg-orange-500 text-white shadow-orange-500/30' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>出牌</button>
+                                        <button onClick={discardHand} disabled={selectedCards.length === 0 || discardsLeft <= 0 || gameState === 'scoring'} className={`flex-1 py-4 rounded-xl font-bold text-lg border-2 transition-all active:scale-95 ${selectedCards.length > 0 && discardsLeft > 0 ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-slate-700 text-slate-600 cursor-not-allowed'}`}>弃牌</button>
+                                    </div>
+                                    <div className="mt-4 mb-4 flex gap-4 w-full px-2">
+                                        <button onClick={() => setHand(prev => [...prev].sort((a,b) => b.rankIndex - a.rankIndex))} className="flex-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 py-3 rounded-xl font-bold text-sm sm:text-base border border-slate-600 shadow-md transition-colors">按点数排序</button>
+                                        <button onClick={() => setHand(prev => [...prev].sort((a,b) => a.suit.localeCompare(b.suit)))} className="flex-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 py-3 rounded-xl font-bold text-sm sm:text-base border border-slate-600 shadow-md transition-colors">按花色排序</button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </>
+                )}
+                {message && <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-yellow-500 text-black px-8 py-4 rounded-xl font-bold shadow-2xl animate-bounce z-[60] text-xl border-4 border-white whitespace-nowrap">{message}</div>}
                 </div>
             );
         }
@@ -824,3 +918,4 @@
     </script>
 </body>
 </html>
+```eof
